@@ -1,0 +1,354 @@
+==========================================================================
+C++ Coding Style Guide
+==========================================================================
+# Author : Christopher Batten
+# Date   : September 24, 2008
+
+Coding style is a very personal issue, but it can help to have some
+general guidelines so that the code written by different developers has
+a consistent look and feel. This makes the code easier to read and
+encourages collaboration. This documentation outlines some suggested
+guidelines for structuring and formatting plain text and source code
+files.
+
+ Table of Contents
+  1. General Guidelines
+  2. Plain Text Guidelines
+  3. File Guidelines
+  4. Coding Guidelines
+  5. Emacs Helper Functions
+  6. References
+
+--------------------------------------------------------------------------
+1. General Guidelines
+--------------------------------------------------------------------------
+
+Usually all files should be around 74 characters wide. It's okay for
+some lines to be a little longer than 74 characters but try to avoid it
+if you can. To make sure that all files look the same on all platforms
+and in all editors, word wrap all paragraphs yourself; Do not save very
+long lines in a file and rely on the end-user's editor to automatically
+refill paragraphs.
+
+No matter what kind of file, we should never include tab characters. We
+should always use spaces so that a file looks the same for every user.
+Of course, we can still use tab stops but these tabs should be
+immediately converted into spaces. In general, we should use a tab stop
+of two characters. Larger tab stops make it difficult to fit enough
+content in 74 characters.
+
+--------------------------------------------------------------------------
+2. Plain Text Guidelines
+--------------------------------------------------------------------------
+
+We use plain text formatting for documentation (eg. 'mcppbs-uguide.txt'). 
+Consistent plain text formatting is easier to read and enables automatic
+processing with various scripts. An example showing the overall
+structure of a plain text document is shown below:
+ 
+ ==============================================================
+ Title of Document
+ ==============================================================
+ # Author : <author>
+ # Date   : <date>
+ # Other  : <metadata>
+
+ Some example text. Use single quotes for 'typewriter' font
+ and use underscores for _emphasis_.
+
+  Table of Contents
+   1. foo
+   2. bar
+
+ --------------------------------------------------------------
+ 1. foo
+ --------------------------------------------------------------
+
+ Discussion of section foo.
+
+  verbatim block
+  verbatim block
+ 
+ --------------------------------------------------------------
+ 2. bar
+ --------------------------------------------------------------
+
+ Discussion of section bar.
+
+  - list item 1
+  - list item 2
+  - list item 3
+
+The top of every plain text file should include a header which specifies
+the document's title, author, date, and other metadata. Although shown
+as shorter lines, the first and second line of the file should be 74 '='
+characters. The header should be separated from the rest of the document
+with a blank line.
+
+After the header should come one or more paragraphs of text. Regular
+text should always start in the first column of the file. Paragraphs are
+separated by a blank line. We can use two kinds of inline format
+specifiers. Surrounding a word with ' characters means that the word
+should be in typewriter font, and surrounding a word with _ characters
+means that the word should be emphasized. If text is indented so that it
+does not start in the first column then it is assumed to be a block of
+verbatim text. This is useful for expressing sample code or example
+commands. There is one exception to this rule. If a line is indented but
+the first character is a dash then it is assumed to be a list item.
+
+If your document is long, then break it into sections. The start of each
+section should be denoted with 74 '-' characters as shown above, and it
+is suggested that you include a table of contents at the top of the
+file.
+
+--------------------------------------------------------------------------
+3. File Guidelines
+--------------------------------------------------------------------------
+
+File names should use a dash as a separator. Files should be named after
+the primary class they define and they should always use the abbreviated
+subproject name as a prefix (eg. 'foo-'). So if we have a class 'Bar' in
+subproject 'foo' then we will usually have a header file ('foo-Bar.h'),
+a source file ('foo-Bar.cc'), and a unit test file ('foo-Bar.t.cc').
+Some files need a inline header/source file ('foo-bar.inl') which should
+contain inline definitions for macros, inline functions, and templates.
+Files which contain a collection of smaller classes, functions, and
+macros usually have a Utils suffix.
+
+An example of the structure to use for header files is shown below.
+
+ //==============================================================
+ // foo::Bar : brief description of foo::Bar
+ //==============================================================
+ // Detailed description of foo::Bar
+
+ #ifndef FOO_BAR_H
+ #define FOO_BAR_H
+
+ namespace foo {
+   // Declarations for Bar
+ }
+
+ // Macro declarations
+
+ #define FOO_BAR_MACRO( arg1_, arg2_ ) \
+   FOO_BAR_MACRO_( arg1_, arg2_ )
+
+ #include "foo-Bar.inl"
+ #endif /* FOO_BAR_H */
+
+As with plain text files, a row of '=' characters is used for the main
+title and to separate very coarse-grain sections. Use a row of '-'
+characters to separate coarse-grain sections, and you can use something
+like the following to separate finer-grain sections if needed.
+
+ //--- Fine-Grain ---------------------------------------
+
+Always use include guards (eg. FOO_BAR_H) to avoid including the same
+header more than once. Header files should usually provide all of the
+documentation needed to use the classes and functions defined in that
+physical component. Some more involved classes might include a
+'foo-Bar-uguide.txt' file as a user guide. Source files should always
+'#include' its header file first, and then '#include' other header
+files. Source files should only contain comments which help the reader
+understand the implementation. Never globally import namespaces with the
+"using" directive at file scope in the header (eg. do not place "using
+std;" in any of your headers). Using directives for notational
+convenience are really only safe in a function, or maybe at the very
+toplevel source file (see Section 8.2.3 in [1]).
+
+Your source file should be structured as shown below. 
+
+ //==============================================================
+ // foo-Bar.cc
+ //==============================================================
+ // Overview of implementation approach
+
+ #include "foo-Bar.h"
+
+ namespace {
+   // private functions
+ }
+
+ namespace foo {
+   // Normal outline defintions go here
+ }
+
+Notice that we always open the subproject namespace in the source file
+and then all definitions should be indented by two spaces since they are
+nested under this open namespace. Private functions should be declared
+in an unnamed namespace to avoid name classes. Do not declare such
+functions at file scope nor in the subproject's scope (see Section
+8.2.5.1 of [1]).
+
+When declaring templated/inlined classes and functions, you should only
+declare the interfaces in the header file. This makes it much easer for
+a user to skim through the interfaces and see how the code works. Place
+the implementations in a separate '.inl' file and then you can
+'#include' this file in the header. The '.inl' file is inbetween a
+source and header file since unlike a source file it has to be visible
+at the point of use and must be installed along side headers, but unlike
+a header file it contains extensive implementation details. These '.inl'
+files should never be included by users of the component. They are
+explicitly for implementation details and must only be included at the
+bottom of the corresponding header file. An example '.inl' file is shown
+below.
+
+ //==============================================================
+ // foo-Bar.inl
+ //==============================================================
+ // Briefly describe how prologue inclusion works
+
+ namespace foo {
+ namespace details {
+   // Inline definitions go here
+ }}
+
+ #define FOO_BAR_MACRO_( arg1_, arg2_ ) \
+   /* definition of macro */
+
+ #end /* FOO_BAR_PROLOGUE */
+
+Notice that we use a trailing underscore for the macro definition and
+arguments. Trailing underscores should be reserved for these kinds of
+macro implemenation details. Users should never call macros with a
+trailing underscore directly.
+
+--------------------------------------------------------------------------
+4. Coding Guidelines
+--------------------------------------------------------------------------
+
+Use '//' comments for documenting your code and use '/* */' to comment
+out a large portion of code for debugging. Use the plain text formatting
+guides in your comments.
+
+Class names should begin with a capital letter and should use camel case
+(eg. 'FooBar'). Abstract interface classes should begin with a capital
+'I' (eg. 'IFooBar'). Implementation base classes which inherit from an
+abstract base class should be named with an underscore separating the
+base class name from the implementation type (eg. 'IFooBar_BasicImpl').
+Methods and free functions should use underscores (eg. 'foo_bar()').
+Variable names should also use underscores. Member variables should use
+a 'm_' prefix, global variables should use a 'g_' prefix, and static
+variables should use a 's_' prefix. Macro names should be uppercase and
+should use the abbreviated subproject name as a prefix (eg. 'FOO_BAR').
+Macro argument names should use a trailing underscore to try and prevent
+name clashes.
+
+Usually the brace after function definitions should be on a new line by
+itself. The brace after class declarations, structure declarations, 'if'
+statements, 'while' statements, and 'for' statements should be on the
+same line. Here is an example of a class declaration.
+
+ class Bar {
+
+  public:
+   void member_func1();
+   void member_func2();
+
+  private:
+   int m_var1;
+   int m_var2;
+
+ };
+
+Here is an example of function definitions:
+
+ void Bar::member_func1()
+ {
+   if ( expr ) {
+     statement1;
+     statement2;
+   }
+ } 
+
+ void Bar::member_func2()
+ {
+   while ( expr ) {
+     statement1;
+     statement2;
+   }
+ } 
+
+Of course these are just guidelines. If expressions get to complicated
+it is fine to move the brace down to a new line. Use whitespace to help
+specify relationships. For example, when we call a function we want to
+separate the function name from the arguments so that the reader can
+clearly see which is which. Of course sometimes with single argument
+functions this can be gratuitous.
+
+ foorbar(a);
+ foobar( a, b, c );
+ 
+Same thing goes for function declarations. And for functions with long
+arguments simply indent the continued argument list on the next line and
+line it up with the first lines arguments if possible.
+
+ int foobar( int a, int b, int c );
+ int foobar( int a, int b, int c,
+             int d, int e, int f );
+
+Use whitespace carefully in for loops, if statements, and other operator
+expressions again to clearly express independent tokens for the reader.
+Try to avoid "compressing" all the whitespace out of a for loop.
+
+ for ( int i = 0; i < limit; i++ ) {
+   temp = ( 3*a ) + 47;
+   if ( temp > max )
+     max = temp;
+ }
+
+--------------------------------------------------------------------------
+5. Emacs Helper Functions
+--------------------------------------------------------------------------
+
+A few simple Emacs functions can help implement some of these style
+guidelines. The following settings configure the tab width, text width,
+and tab/space behavior for various major modes. It will also highlight
+hard tabs in bright red so you can see them and convert them into
+spaces.
+
+ (defface mcppbs-bright-tab-face    '((t (:background "red"))) "")
+ (defvar  mcppbs-bright-tab-keyword '(("\t" . 'cbx-bright-tab-face)))
+  
+ (defun mcppbs-settings ()
+   (turn-on-auto-fill)
+   (setq tab-width                 2   )
+   (setq fill-column               72  )
+   (setq sentence-end-double-space nil )
+   (setq indent-tabs-mode          nil )
+   (setq truncate-lines            t   )
+   (setq indicate-empty-lines      nil )
+   (font-lock-add-keywords         nil cbx-bright-tab-keyword)
+ )
+
+ (add-hook 'c-mode-hook    'mcppbs-settings)
+ (add-hook 'c++-mode-hook  'mcppbs-settings)
+ (add-hook 'text-mode-hook 'mcppbs-settings)
+
+The following function is useful for creating lines of '=' or '-'
+characters (or any character) suitable as a separator.
+
+ (defun extend-char-to-end ()
+   (interactive)
+   (let ( (end-point (point-at-eol)) (match-char nil) )
+     (beginning-of-line)
+     (re-search-forward "[^ ][ ]*$" end-point t)
+     (setq match-char (string-to-char (match-string 0)))
+     (replace-match "")
+     (insert-char match-char (- 74 (current-column)))
+   )
+ )
+
+Then to make any character extend all the way across to the 74th column
+just position the cursor on that line and execute this function.
+    
+--------------------------------------------------------------------------
+6. References
+--------------------------------------------------------------------------
+
+ - [1] Bjarne Stroustrupe, "The C++ Programming Language, 3rd Ed."
+       Addison Wesley, 1997
+
+ - [2] John Lakos, "Large-Scale C++ Software Design"
+       Addison Wesley, 1996
