@@ -75,27 +75,27 @@ install_exes_dir := $(DESTDIR)/bin
 #  - CPPFLAGS : flags for the preprocessor (eg. -I,-D)
 #  - CXXFLAGS : flags for C++ compiler (eg. -Wall,-g,-O3)
 
-CXX           := @CXX@
-CPPFLAGS      := @CPPFLAGS@
-CXXFLAGS      := @CXXFLAGS@
-COMPILE       := $(CXX) $(CXXFLAGS) -MMD -MP -I. $(CPPFLAGS) \
-                 $(sprojs_include)
-# Linker
-#  - LDFLAGS : flags for the linker (eg. -L)
+CXX         := @CXX@
+CPPFLAGS    := @CPPFLAGS@
+CXXFLAGS    := @CXXFLAGS@
+COMPILE     := $(CXX) $(CXXFLAGS) -MMD -MP -I. $(CPPFLAGS)
 
-LD            := $(CXX)
-LDFLAGS       := @LDFLAGS@
-LINK          := $(LD) -L. $(LDFLAGS)
+# Linker
+#  - LDFLAGS  : flags for the linker (eg. -L)
+
+LD          := $(CXX)
+LDFLAGS     := @LDFLAGS@
+LINK        := $(LD) -L. $(LDFLAGS)
 
 # Library creation
 
-AR            := @AR@
-RANLIB        := @RANLIB@
+AR          := @AR@
+RANLIB      := @RANLIB@
 
 # Host simulator
 
-RUN           := @RUN@
-RUNFLAGS      := @RUNFLAGS@
+RUN         := @RUN@
+RUNFLAGS    := @RUNFLAGS@
 
 # Installation
 
@@ -161,25 +161,44 @@ endif
 $(1)_.cc :
 	echo "int $(2)_( int arg ) { return arg; }" > $$@
 
-# Build the object files from source for this subproject
+# Build the object files from assembly sources for this subproject
 
-$(2)_src_objs := $$(patsubst %.cc, %.o, $$($(2)_srcs))
-$$($(2)_src_objs) : %.o : %.cc
-	$(COMPILE) $$($(2)_cppflags) -c $$<
+$(2)_asm_srcs := $$(filter %.S, $$($(2)_srcs))
+$(2)_asm_objs := $$(patsubst %.S, %.o, $$($(2)_asm_srcs))
+$(2)_asm_deps := $$(patsubst %.S, %.d, $$($(2)_asm_srcs))
 
-$(2)_objs += $$($(2)_src_objs)
-$(2)_deps += $$(patsubst %.o, %.d, $$($(2)_src_objs))
-$(2)_junk += $$($(2)_src_objs) $$($(2)_deps)
-
-# Build the object files from assembly for this subproject
-
-$(2)_asm_objs := $$(patsubst %.S, %.o, $$($(2)_asms))
 $$($(2)_asm_objs) : %.o : %.S
 	$(COMPILE) $$($(2)_cppflags) -c $$<
 
 $(2)_objs += $$($(2)_asm_objs)
-$(2)_deps += $$(patsubst %.o, %.d, $$($(2)_asm_objs))
-$(2)_junk += $$($(2)_asm_objs) $$($(2)_deps)
+$(2)_deps += $$($(2)_asm_deps)
+$(2)_junk += $$($(2)_asm_deps) $$($(2)_asm_objs)
+
+# Build the object files from C sources for this subproject
+
+$(2)_c_srcs := $$(filter %.c, $$($(2)_srcs))
+$(2)_c_objs := $$(patsubst %.c, %.o, $$($(2)_c_srcs))
+$(2)_c_deps := $$(patsubst %.c, %.d, $$($(2)_c_srcs))
+
+$$($(2)_c_objs) : %.o : %.c
+	$(COMPILE) $$($(2)_cppflags) -c $$<
+
+$(2)_objs += $$($(2)_c_objs)
+$(2)_deps += $$($(2)_c_deps)
+$(2)_junk += $$($(2)_c_deps) $$($(2)_c_objs)
+
+# Build the object files from C++ sources for this subproject
+
+$(2)_cxx_srcs := $$(filter %.cc, $$($(2)_srcs))
+$(2)_cxx_objs := $$(patsubst %.cc, %.o, $$($(2)_cxx_srcs))
+$(2)_cxx_deps := $$(patsubst %.cc, %.d, $$($(2)_cxx_srcs))
+
+$$($(2)_cxx_objs) : %.o : %.cc
+	$(COMPILE) $$($(2)_cppflags) -c $$<
+
+$(2)_objs += $$($(2)_cxx_objs)
+$(2)_deps += $$($(2)_cxx_deps)
+$(2)_junk += $$($(2)_cxx_deps) $$($(2)_cxx_objs)
 
 # Build a library for this subproject
 
@@ -213,47 +232,51 @@ $$($(2)_test_exes) : %-utst : %.t.o $$($(2)_link_prereqs) $(utst_libname)
 
 $(2)_deps += $$($(2)_test_deps)
 $(2)_junk += \
-	$$($(2)_test_objs) $$($(2)_test_deps) \
+	$$($(2)_test_deps) $$($(2)_test_objs) \
   $$($(2)_test_exes) *.junk-dat
 
 # Run unit tests
 
 $$($(2)_test_outs) : %.out : %
-	$(RUN) $(RUNFLAGS) ./$$< default | tee $$@
+	$(RUN) $(RUNFLAGS) ./$$< default 2>&1 | tee $$@
 
 $(2)_junk += $$($(2)_test_outs)
 
-# Build programs
+# Build C programs
 
-$(2)_prog_objs := $$(patsubst %.cc, %.o, $$($(2)_prog_srcs))
-$(2)_prog_deps := $$(patsubst %.cc, %.d, $$($(2)_prog_srcs))
-$(2)_prog_exes := $$(patsubst %.cc, %,   $$($(2)_prog_srcs))
+$(2)_prog_c_srcs := $$(filter %.c, $$($(2)_prog_srcs))
+$(2)_prog_c_srcs += $$(filter %.c, $$($(2)_install_prog_srcs))
+$(2)_prog_c_objs := $$(patsubst %.c, %.o, $$($(2)_prog_c_srcs))
+$(2)_prog_c_deps := $$(patsubst %.c, %.d, $$($(2)_prog_c_srcs))
+$(2)_prog_c_exes := $$(patsubst %.c, %,   $$($(2)_prog_c_srcs))
 
-$$($(2)_prog_objs) : %.o : %.cc
+$$($(2)_prog_c_objs) : %.o : %.c
 	$(COMPILE) $$($(2)_cppflags) -c $$<
 
-$$($(2)_prog_exes) : % : %.o $$($(2)_link_prereqs)
+$$($(2)_prog_c_exes) : % : %.o $$($(2)_link_prereqs)
 	$(LINK) $$($(2)_ldflags) -o $$@ $$< $$($(2)_libs) 
 
-$(2)_deps += $$($(2)_prog_deps)
-$(2)_junk += $$($(2)_prog_objs) $$($(2)_prog_deps) $$($(2)_prog_exes)
-
-# Build programs which will be installed
-
-$(2)_install_prog_objs := $$(patsubst %.cc, %.o, $$($(2)_install_prog_srcs))
-$(2)_install_prog_deps := $$(patsubst %.cc, %.d, $$($(2)_install_prog_srcs))
-$(2)_install_prog_exes := $$(patsubst %.cc, %,   $$($(2)_install_prog_srcs))
-
-$$($(2)_install_prog_objs) : %.o : %.cc
-	$(COMPILE) $$($(2)_cppflags) -c $$<
-
-$$($(2)_install_prog_exes) : % : %.o $$($(2)_link_prereqs)
-	$(LINK) $$($(2)_ldflags) -o $$@ $$< $$($(2)_libs) 
-
-$(2)_deps += $$($(2)_install_prog_deps)
+$(2)_deps += $$($(2)_prog_c_deps)
 $(2)_junk += \
-  $$($(2)_install_prog_objs) $$($(2)_install_prog_deps) \
-  $$($(2)_install_prog_exes)
+  $$($(2)_prog_c_objs) $$($(2)_prog_c_deps) $$($(2)_prog_c_exes)
+
+# Build C++ programs
+
+$(2)_prog_cxx_srcs := $$(filter %.cc, $$($(2)_prog_srcs))
+$(2)_prog_cxx_srcs += $$(filter %.cc, $$($(2)_install_prog_srcs))
+$(2)_prog_cxx_objs := $$(patsubst %.cc, %.o, $$($(2)_prog_cxx_srcs))
+$(2)_prog_cxx_deps := $$(patsubst %.cc, %.d, $$($(2)_prog_cxx_srcs))
+$(2)_prog_cxx_exes := $$(patsubst %.cc, %,   $$($(2)_prog_cxx_srcs))
+
+$$($(2)_prog_cxx_objs) : %.o : %.cc
+	$(COMPILE) $$($(2)_cppflags) -c $$<
+
+$$($(2)_prog_cxx_exes) : % : %.o $$($(2)_link_prereqs)
+	$(LINK) $$($(2)_ldflags) -o $$@ $$< $$($(2)_libs) 
+
+$(2)_deps += $$($(2)_prog_cxx_deps)
+$(2)_junk += \
+  $$($(2)_prog_cxx_objs) $$($(2)_prog_cxx_deps) $$($(2)_prog_cxx_exes)
 
 # Install subproject's header (.h), inline (.inl), source (.cc), and
 # package config (.pc) files if this subproject is on the sproj_install
@@ -273,9 +296,7 @@ install-libs-$(1) : $$($(2)_install_hdrs_wdir) $$($(2)_libname) $(1).pc
     $(INSTALL_HDR) $$$$file $(install_hdrs_dir)/$(1); \
   done
 	$(INSTALL_LIB) $$($(2)_libname) $(install_libs_dir)
-	sed -i.bak 's/^\(version=\).*/\1$(project_ver)/' $(1).pc
-	rm -rf $(1).pc.bak
-	$(INSTALL_LIB) $(1).pc $(install_pkcs_dir)
+	$(INSTALL_LIB) $(1).pc $(install_pkcs_dir)/$(1).pc
 
 install-libs : install-libs-$(1)
 .PHONY : install-libs-$(1)
@@ -285,6 +306,8 @@ endif
 # We always install executables which have been placed in
 # sproj_install_prog_exes regardless of whether or not subproject is on
 # the sprojs_install list.
+
+$(2)_install_prog_exes = $$(basename $$($(2)_install_prog_srcs))
 
 install-exes-$(1) : $$($(2)_install_prog_exes)
 	$(MKINSTALLDIRS) $(install_exes_dir)

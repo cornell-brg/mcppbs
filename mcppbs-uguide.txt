@@ -59,22 +59,19 @@ character) just use an alias to "undefine" the '%' character like this:
 Before creating a new project we need to decide what to name the
 project. We should choose both a longer descriptive name (eg. Image
 Processing Tools) as well as a short abbreviated name (eg. 'ipt'). For
-this tutorial we will use the abbreviated name 'mcppbs-tut'. So the
-first step is to create a directory with the project name, and to
-simplify the rest of the tutorial we will also define a '$PROJROOT'
-environment variable which contains the absolute path to the project's
-top-level root directory.
-
- % mkdir mcppbs-tut
- % cd mcppbs-tut
- % PROJROOT=$PWD
-
-To instantiate the build system, we need to first download the 'mcppbs'
-template from the public git repository and then we will add some
-metadata about our project to 'configure.ac'
+this tutorial we will use the abbreviated name 'mcppbs-tut'. Once we
+know the abbreviated name for our project, we then need to download and
+extract the 'mcppbs' template from the public git repository. We unpack
+the template into a directory with the abbreviated project name, and to
+simplify simplify the rest of the tutorial we will also define a
+'$PROJROOT' environment variable which contains the absolute path to the
+project's top-level root directory.
 
  % TGZ=http://gitorious.org/cbatten-sw/mcppbs/archive-tarball/master
  % wget -O- $TGZ | tar xzf -
+ % mv cbatten-sw-mcppbs mcppbs-tut
+ % cd mcppbs-tut
+ % PROJROOT=$PWD
 
 Take a look at the files in the top-level project directory.
 
@@ -395,15 +392,21 @@ END
 
 We use 'sgp_' as a prefix for all make variables in the makefile
 fragment. Here is a list of all the recognized make variables for a
-subproject named 'sproj'.
+subproject named 'sproj'. 
 
- - 'sproj_hdrs;              : Header files (.h)
+ - 'sproj_hdrs;              : Headers (.h)
  - 'sproj_inls'              : Inline header/source files (.inl)
- - 'sproj_srcs'              : Source files (.cc)
- - 'sproj_asms'              : Assembly files (.S)
- - 'sproj_test_srcs'         : Source files for unit tests (.t.cc)
- - 'sproj_prog_srcs'         : Source files for programs (.cc)
- - 'sproj_install_prog_srcs' : Source files for programs to install (.cc)
+ - 'sproj_srcs'              : Source files (.cc,.c,.S)
+ - 'sproj_test_srcs'         : Sources for unit tests (.t.cc)
+ - 'sproj_prog_srcs'         : Sources for programs (.cc,.c)
+ - 'sproj_install_prog_srcs' : Sources for programs to install (.cc,.c)
+
+Note that we can include C, C++, and assembly source files in our
+sources list ('sprojs_srcs'), C and C++ source files in our program
+sources ('sproj_proj_srcs', 'sproj_install_prog_srcs'), but only C++
+test programs ('sproj_test_srcs'). Even though we can include these
+different type of sources everything is always compiled with the C++
+compiler.
 
 Now that our 'sgp' subproject is ready to go, the last step is to
 include the subproject in the top-level 'configure.ac' file. If you look
@@ -1017,7 +1020,7 @@ scripts.
 
  % cd $PROJROOT/build
  % export PKG_CONFIG_PATH="$PWD/install/share/pkgconfig:$PKG_CONFIG_PATH"
- % pkg-config --list-all | grep -e "utst" -e "sgp" -e "ipl"
+ % pkg-config --exists utst sgp ipl; echo $?
 
 --------------------------------------------------------------------------
 1.6. Including External Subprojects
@@ -1045,12 +1048,15 @@ update our 'configure.ac'.
 
  % cd $PROJROOT
  % sed -i.bak \
+     -e 's/\(AC_CONFIG_SRCDIR\).*/\1([ipl\/ipl.ac])/' \
      -e 's/\(MCPPBS_INCLUDE\)_INTERNAL(\[utst\])/\1_EXTERNAL([utst])/' \
      -e 's/\(MCPPBS_INCLUDE\)_INTERNAL(\[sgp\])/\1_EXTERNAL([sgp])/' \
      -e 's/MCPPBS_INSTALL_LIBS.*//' configure.ac
  % autoconf && autoheader
 
-Now we rebuild the project in a new build directory. 
+Notice that we need to change 'AC_CONFIG_SRCDIR' since our project no
+longer includes the 'utst/utst.h' source file. Now we rebuild the
+project in a new build directory.
 
  % cd $PROJROOT
  % mkdir build-extsprojs
@@ -1551,11 +1557,10 @@ the name of the subproject):
  - 'sproj_libs'              : Libs required to build subproject (-l)
  - 'sproj_hdrs'              : Header files (.h)
  - 'sproj_inls'              : Inline header/source files (.inl)
- - 'sproj_srcs'              : Source files (.cc)
- - 'sproj_asms'              : Assembly files (.S)
- - 'sproj_test_srcs'         : Source files for unit tests (.t.cc)
- - 'sproj_prog_srcs'         : Source files for programs (.cc)
- - 'sproj_install_prog_srcs' : Source files for programs to install (.cc)
+ - 'sproj_srcs'              : Source files (.cc,.c,.S)
+ - 'sproj_test_srcs'         : Sources for unit tests (.t.cc)
+ - 'sproj_prog_srcs'         : Sources for programs (.cc,.c)
+ - 'sproj_install_prog_srcs' : Sources for programs to install (.cc,.c)
 
 The 'MCPPBS_SUBPROJECT' autoconf macro in 'subproject.ac' will
 automatically figure out what compiler and linker flags are required to
