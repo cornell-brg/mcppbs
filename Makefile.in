@@ -71,21 +71,30 @@ install_exes_dir := $(DESTDIR)/bin
 # Programs and flags 
 #-------------------------------------------------------------------------
 
-# C++ compiler
+# Standard flags
 #  - CPPFLAGS : flags for the preprocessor (eg. -I,-D)
+#  - CFLAGS   : flags for C compiler (eg. -Wall,-g,-O3)
 #  - CXXFLAGS : flags for C++ compiler (eg. -Wall,-g,-O3)
-
-CXX         := @CXX@
-CPPFLAGS    := @CPPFLAGS@
-CXXFLAGS    := @CXXFLAGS@
-COMPILE     := $(CXX) $(CXXFLAGS) -MMD -MP -I. $(CPPFLAGS)
-
-# Linker
 #  - LDFLAGS  : flags for the linker (eg. -L)
 
-LD          := $(CXX)
+CPPFLAGS    := @CPPFLAGS@
+CFLAGS      := @CFLAGS@
+CXXFLAGS    := @CXXFLAGS@
 LDFLAGS     := @LDFLAGS@
-LINK        := $(LD) -L. $(LDFLAGS)
+
+# C compiler and linker
+
+CC          := @CC@
+COMPILE_C   := $(CC) $(CFLAGS) -MMD -MP -I. $(CPPFLAGS)
+LD_C        := $(CC)
+LINK_C      := $(LD_C) -L. $(LDFLAGS)
+
+# C++ compiler and linker
+
+CXX         := @CXX@
+COMPILE_CXX := $(CXX) $(CXXFLAGS) -MMD -MP -I. $(CPPFLAGS)
+LD_CXX      := $(CXX)
+LINK_CXX    := $(LD_CXX) -L. $(LDFLAGS)
 
 # Library creation
 
@@ -168,7 +177,7 @@ $(2)_asm_objs := $$(patsubst %.S, %.o, $$($(2)_asm_srcs))
 $(2)_asm_deps := $$(patsubst %.S, %.d, $$($(2)_asm_srcs))
 
 $$($(2)_asm_objs) : %.o : %.S
-	$(COMPILE) $$($(2)_cppflags) -c $$<
+	$(COMPILE_C) $$($(2)_cppflags) -c $$<
 
 $(2)_objs += $$($(2)_asm_objs)
 $(2)_deps += $$($(2)_asm_deps)
@@ -181,7 +190,7 @@ $(2)_c_objs := $$(patsubst %.c, %.o, $$($(2)_c_srcs))
 $(2)_c_deps := $$(patsubst %.c, %.d, $$($(2)_c_srcs))
 
 $$($(2)_c_objs) : %.o : %.c
-	$(COMPILE) $$($(2)_cppflags) -c $$<
+	$(COMPILE_C) $$($(2)_cppflags) -c $$<
 
 $(2)_objs += $$($(2)_c_objs)
 $(2)_deps += $$($(2)_c_deps)
@@ -194,7 +203,7 @@ $(2)_cxx_objs := $$(patsubst %.cc, %.o, $$($(2)_cxx_srcs))
 $(2)_cxx_deps := $$(patsubst %.cc, %.d, $$($(2)_cxx_srcs))
 
 $$($(2)_cxx_objs) : %.o : %.cc
-	$(COMPILE) $$($(2)_cppflags) -c $$<
+	$(COMPILE_CXX) $$($(2)_cppflags) -c $$<
 
 $(2)_objs += $$($(2)_cxx_objs)
 $(2)_deps += $$($(2)_cxx_deps)
@@ -224,10 +233,10 @@ $(2)_test_exes := $$(patsubst %.t.cc, %-utst, $$($(2)_test_srcs))
 $(2)_test_outs := $$(patsubst %,      %.out,  $$($(2)_test_exes))
 
 $$($(2)_test_objs) : %.o : %.cc
-	$(COMPILE) $$($(2)_cppflags) $(utst_cppflags) -c $$<
+	$(COMPILE_CXX) $$($(2)_cppflags) $(utst_cppflags) -c $$<
 
 $$($(2)_test_exes) : %-utst : %.t.o $$($(2)_link_prereqs) $(utst_libname) 
-	$(LINK) $$($(2)_ldflags) $(utst_ldflags) -o $$@ $$< \
+	$(LINK_CXX) $$($(2)_ldflags) $(utst_ldflags) -o $$@ $$< \
     $$($(2)_libs) $(utst_libs)
 
 $(2)_deps += $$($(2)_test_deps)
@@ -251,11 +260,12 @@ $(2)_prog_c_deps := $$(patsubst %.c, %.d, $$($(2)_prog_c_srcs))
 $(2)_prog_c_exes := $$(patsubst %.c, %,   $$($(2)_prog_c_srcs))
 
 $$($(2)_prog_c_objs) : %.o : %.c
-	$(COMPILE) $$($(2)_cppflags) -c $$<
+	$(COMPILE_C) $$($(2)_cppflags) -c $$<
 
 $$($(2)_prog_c_exes) : % : %.o $$($(2)_link_prereqs)
-	$(LINK) $$($(2)_ldflags) -o $$@ $$< $$($(2)_libs) 
+	$(LINK_C) $$($(2)_ldflags) -o $$@ $$< $$($(2)_libs) 
 
+$(2)_exes += $$($(2)_prog_c_exes) 
 $(2)_deps += $$($(2)_prog_c_deps)
 $(2)_junk += \
   $$($(2)_prog_c_objs) $$($(2)_prog_c_deps) $$($(2)_prog_c_exes)
@@ -269,11 +279,12 @@ $(2)_prog_cxx_deps := $$(patsubst %.cc, %.d, $$($(2)_prog_cxx_srcs))
 $(2)_prog_cxx_exes := $$(patsubst %.cc, %,   $$($(2)_prog_cxx_srcs))
 
 $$($(2)_prog_cxx_objs) : %.o : %.cc
-	$(COMPILE) $$($(2)_cppflags) -c $$<
+	$(COMPILE_CXX) $$($(2)_cppflags) -c $$<
 
 $$($(2)_prog_cxx_exes) : % : %.o $$($(2)_link_prereqs)
-	$(LINK) $$($(2)_ldflags) -o $$@ $$< $$($(2)_libs) 
+	$(LINK_CXX) $$($(2)_ldflags) -o $$@ $$< $$($(2)_libs) 
 
+$(2)_exes += $$($(2)_prog_cxx_exes) 
 $(2)_deps += $$($(2)_prog_cxx_deps)
 $(2)_junk += \
   $$($(2)_prog_cxx_objs) $$($(2)_prog_cxx_deps) $$($(2)_prog_cxx_exes)
@@ -311,7 +322,7 @@ $(2)_install_prog_exes = $$(basename $$($(2)_install_prog_srcs))
 
 install-exes-$(1) : $$($(2)_install_prog_exes)
 	$(MKINSTALLDIRS) $(install_exes_dir)
-	for file in $$^; do \
+	for file in $$($(2)_install_prog_exes); do \
     $(INSTALL_EXE) $$$$file $(install_exes_dir); \
   done
 
@@ -336,7 +347,7 @@ clean-$(1) :
 
 libs += $$($(2)_libname)
 objs += $$($(2)_objs)
-exes += $$($(2)_prog_exes) $$($(2)_install_prog_exes)
+exes += $$($(2)_exes)
 outs += $$($(2)_test_outs)
 junk += $$($(2)_junk)
 deps += $$($(2)_deps)

@@ -12,8 +12,23 @@
 UTST_TEST_CASE( TestCheckBasics )
 {
   UTST_CHECK( 1 + 1 == 2 );
-  UTST_CHECK_EQ(  1 + 1, 2 );
-  UTST_CHECK_NEQ( 1 + 2, 2 );
+  UTST_CHECK_EQ  ( 1 + 1, 2 );
+  UTST_CHECK_NEQ ( 1 + 2, 2 );
+}
+
+//------------------------------------------------------------------------
+// Test check floating-point
+//------------------------------------------------------------------------
+
+UTST_TEST_CASE( TestCheckFloatingPoint )
+{
+  UTST_CHECK_FP_EQ( 0.5 + 0.5, 1.0 );
+  UTST_CHECK_FP_EQ( 0.1 + 0.1, 0.2 );
+  UTST_CHECK_FP_EQ( 0.3 + 0.3, 0.6 );
+
+  UTST_CHECK_FP_NEQ( 0.5 + 0.5, 1.10 );
+  UTST_CHECK_FP_NEQ( 0.1 + 0.1, 0.25 );
+  UTST_CHECK_FP_NEQ( 0.3 + 0.3, 0.66 );
 }
 
 //------------------------------------------------------------------------
@@ -144,6 +159,7 @@ UTST_AUTO_TEST_CASE( TestAutoReg2 )
 int main( int argc, char* argv[] )
 {
   utst::g_default_suite().add_test( TestCheckBasics() );
+  utst::g_default_suite().add_test( TestCheckFloatingPoint() );
   utst::g_default_suite().add_test( TestCheckThrow() );
   utst::g_default_suite().add_test( TestCheckContEq() );
   utst::g_default_suite().add_test( TestLogMacros() );

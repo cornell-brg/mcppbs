@@ -28,8 +28,18 @@
 // this means a and b must have insertion operators defined for them. If
 // they don't then you are better off just using a UTST_CHECK test.
 
-#define UTST_CHECK_EQ( expression1_, expression2_ ) \
-  UTST_CHECK_EQ_( expression1_, expression2_ )
+#define UTST_CHECK_EQ( expression0_, expression1_ ) \
+  UTST_CHECK_EQ_( expression0_, expression1_ )
+
+//------------------------------------------------------------------------
+// UTST_CHECK_FP_EQ
+//------------------------------------------------------------------------
+// Check whether or not the given floating-point expresssions are within
+// 0.0001 of each other. If you need more precision you will have to do
+// the check explicitly with UTST_CHECK.
+
+#define UTST_CHECK_FP_EQ( expression0_, expression1_ ) \
+  UTST_CHECK_FP_EQ_( expression0_, expression1_ )
 
 //------------------------------------------------------------------------
 // UTST_CHECK_NEQ
@@ -43,8 +53,18 @@
 // for them. If they don't then you are better off just using a
 // UTST_TEST test.
 
-#define UTST_CHECK_NEQ( expression1_, expression2_ ) \
-  UTST_CHECK_NEQ_( expression1_, expression2_ )
+#define UTST_CHECK_NEQ( expression0_, expression1_ ) \
+  UTST_CHECK_NEQ_( expression0_, expression1_ )
+
+//------------------------------------------------------------------------
+// UTST_CHECK_FP_NEQ
+//------------------------------------------------------------------------
+// Check whether or not the given floating-point expresssions are within
+// 0.0001 of each other. If you need more precision you will have to do
+// the check explicitly with UTST_CHECK.
+
+#define UTST_CHECK_FP_NEQ( expression0_, expression1_ ) \
+  UTST_CHECK_FP_NEQ_( expression0_, expression1_ )
 
 //------------------------------------------------------------------------
 // UTST_CHECK_THROW 

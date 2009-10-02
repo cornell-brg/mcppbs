@@ -44,6 +44,10 @@ AC_CANONICAL_HOST
 # Basic checks
 #-------------------------------------------------------------------------
 
+# Check for C compiler and set default C compiler flags
+AC_PROG_CC
+AC_SUBST([CFLAGS],["-Wall -g -O3"])
+
 # Check for C++ compiler and set default C++ compiler flags
 AC_PROG_CXX
 AC_SUBST([CXXFLAGS],["-Wall -g -O3"])

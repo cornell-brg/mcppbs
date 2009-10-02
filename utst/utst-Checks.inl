@@ -10,6 +10,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <cmath>
 
 namespace utst {
 namespace details {
@@ -20,18 +21,40 @@ namespace details {
 
   template < typename Expr1, typename Expr2 >
   void check_eq( const std::string& file_name, int line_num,
-                 const Expr1& expression1, const Expr2& expression2,
-                 const std::string& expression1_str,
-                 const std::string& expression2_str )
+                 const Expr1& expression0, const Expr2& expression1,
+                 const std::string& expression0_str,
+                 const std::string& expression1_str )
   {
     utst::TestLog& log = utst::TestLog::instance();
-    bool result = (expression1 == expression2);
+    bool result = (expression0 == expression1);
     
     std::ostringstream descr;
-    descr << expression1_str << " == " << expression2_str;
+    descr << expression0_str << " == " << expression1_str;
     
     std::ostringstream msg;
-    msg << expression1 << (result ? " == " : " != ") << expression2;
+    msg << expression0 << (result ? " == " : " != ") << expression1;
+    
+    log.log_test( file_name, line_num, descr.str(), result, msg.str() );
+  }
+
+  //----------------------------------------------------------------------
+  // check_fp_eq
+  //----------------------------------------------------------------------
+
+  template < typename T >
+  void check_fp_eq( const std::string& file_name, int line_num,
+                    const T& num0, const T& num1,
+                    const std::string& expression0_str,
+                    const std::string& expression1_str )
+  {
+    utst::TestLog& log = utst::TestLog::instance();
+    bool result = ( std::abs(num0 - num1) <= 0.0001 * std::abs(num0) );
+    
+    std::ostringstream descr;
+    descr << expression0_str << " == " << expression1_str;
+    
+    std::ostringstream msg;
+    msg << num0 << (result ? " == " : " != ") << num1;
     
     log.log_test( file_name, line_num, descr.str(), result, msg.str() );
   }
@@ -42,18 +65,40 @@ namespace details {
 
   template < typename Expr1, typename Expr2 >
   void check_neq( const std::string& file_name, int line_num,
-                 const Expr1& expression1, const Expr2& expression2,
-                 const std::string& expression1_str, 
-                 const std::string& expression2_str )
+                 const Expr1& expression0, const Expr2& expression1,
+                 const std::string& expression0_str, 
+                 const std::string& expression1_str )
   {
     utst::TestLog& log = utst::TestLog::instance();
-    bool result = (expression1 != expression2);
+    bool result = (expression0 != expression1);
     
     std::ostringstream descr;
-    descr << expression1_str << " != " << expression2_str;
+    descr << expression0_str << " != " << expression1_str;
     
     std::ostringstream msg;
-    msg << expression1 << (result ? " != " : " == ") << expression2;
+    msg << expression0 << (result ? " != " : " == ") << expression1;
+    
+    log.log_test( file_name, line_num, descr.str(), result, msg.str() );
+  }
+
+  //----------------------------------------------------------------------
+  // check_fp_neq
+  //----------------------------------------------------------------------
+
+  template < typename T >
+  void check_fp_neq( const std::string& file_name, int line_num,
+                     const T& num0, const T& num1, 
+                     const std::string& expression0_str,
+                     const std::string& expression1_str )
+  {
+    utst::TestLog& log = utst::TestLog::instance();
+    bool result = !( std::abs(num0 - num1) <= 0.0001 * std::abs(num0) );
+    
+    std::ostringstream descr;
+    descr << expression0_str << " == " << expression1_str;
+    
+    std::ostringstream msg;
+    msg << num0 << (result ? " == " : " != ") << num1;
     
     log.log_test( file_name, line_num, descr.str(), result, msg.str() );
   }
@@ -143,17 +188,33 @@ namespace details {
 // UTST_CHECK_EQ
 //------------------------------------------------------------------------
 
-#define UTST_CHECK_EQ_( expression1_, expression2_ )                    \
+#define UTST_CHECK_EQ_( expression0_, expression1_ )                    \
   utst::details::check_eq( __FILE__, __LINE__,                          \
-    expression1_, expression2_, #expression1_, #expression2_ );
+    expression0_, expression1_, #expression0_, #expression1_ );
+
+//------------------------------------------------------------------------
+// UTST_CHECK_FP_EQ
+//------------------------------------------------------------------------
+
+#define UTST_CHECK_FP_EQ_( expression0_, expression1_ )                 \
+  utst::details::check_fp_eq( __FILE__, __LINE__,                       \
+    expression0_, expression1_, #expression0_, #expression1_ );
 
 //------------------------------------------------------------------------
 // UTST_CHECK_NEQ
 //------------------------------------------------------------------------
 
-#define UTST_CHECK_NEQ_( expression1_, expression2_ )                   \
+#define UTST_CHECK_NEQ_( expression0_, expression1_ )                   \
   utst::details::check_neq( __FILE__, __LINE__,                         \
-    expression1_, expression2_, #expression1_, #expression2_ );
+    expression0_, expression1_, #expression0_, #expression1_ );
+
+//------------------------------------------------------------------------
+// UTST_CHECK_FP_NEQ
+//------------------------------------------------------------------------
+
+#define UTST_CHECK_FP_NEQ_( expression0_, expression1_ )                \
+  utst::details::check_fp_neq( __FILE__, __LINE__,                      \
+    expression0_, expression1_, #expression0_, #expression1_ );
 
 //------------------------------------------------------------------------
 // UTST_CHECK_THROW 
