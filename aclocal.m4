@@ -32,6 +32,19 @@ AC_DEFUN([MCPPBS_INIT],
 ])
 
 #-------------------------------------------------------------------------
+# MCPPBS_ALWAYS_USE_CXX
+#-------------------------------------------------------------------------
+# If the user calls this macro then change the C compiler shell
+# variables so that they use the C++ compiler.
+
+AC_DEFUN([MCPPBS_ALWAYS_USE_CXX],
+[
+  AC_MSG_NOTICE([Will use ${CXX} for C and assembly source files])
+  CC=${CXX}
+  CFLAGS=${CXXFLAGS}
+])
+
+#-------------------------------------------------------------------------
 # MCPPBS_PROG_INSTALL
 #-------------------------------------------------------------------------
 # This macro will add an --enable-stow command line option to the

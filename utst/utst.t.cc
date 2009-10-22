@@ -22,13 +22,19 @@ UTST_TEST_CASE( TestCheckBasics )
 
 UTST_TEST_CASE( TestCheckFloatingPoint )
 {
-  UTST_CHECK_FP_EQ( 0.5 + 0.5, 1.0 );
-  UTST_CHECK_FP_EQ( 0.1 + 0.1, 0.2 );
-  UTST_CHECK_FP_EQ( 0.3 + 0.3, 0.6 );
+  UTST_CHECK_EQ  ( 0.5 + 0.5, 1.0  );
+  UTST_CHECK_EQ  ( 0.1 + 0.1, 0.2  );
+  UTST_CHECK_EQ  ( 0.3 + 0.3, 0.6  );
+  UTST_CHECK_NEQ ( 0.5 + 0.5, 1.10 );
+  UTST_CHECK_NEQ ( 0.1 + 0.1, 0.25 );
+  UTST_CHECK_NEQ ( 0.3 + 0.3, 0.66 );
 
-  UTST_CHECK_FP_NEQ( 0.5 + 0.5, 1.10 );
-  UTST_CHECK_FP_NEQ( 0.1 + 0.1, 0.25 );
-  UTST_CHECK_FP_NEQ( 0.3 + 0.3, 0.66 );
+  UTST_CHECK_EQ  ( 0.5f + 0.5f, 1.0f  );
+  UTST_CHECK_EQ  ( 0.1f + 0.1f, 0.2f  );
+  UTST_CHECK_EQ  ( 0.3f + 0.3f, 0.6f  );
+  UTST_CHECK_NEQ ( 0.5f + 0.5f, 1.10f );
+  UTST_CHECK_NEQ ( 0.1f + 0.1f, 0.25f );
+  UTST_CHECK_NEQ ( 0.3f + 0.3f, 0.66f );
 }
 
 //------------------------------------------------------------------------

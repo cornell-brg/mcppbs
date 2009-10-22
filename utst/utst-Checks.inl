@@ -11,9 +11,42 @@
 #include <sstream>
 #include <iostream>
 #include <cmath>
+#include <functional>
 
 namespace utst {
 namespace details {
+
+  //----------------------------------------------------------------------
+  // ComparisonFunctor
+  //----------------------------------------------------------------------
+
+  template < typename T >
+  struct ComparisonFunctor
+  {
+    bool operator()( const T& value0, const T& value1 ) {
+      return ( value0 == value1 );
+    }
+  };
+
+  //----------------------------------------------------------------------
+  // ComparisonFunctor floating point specializations
+  //----------------------------------------------------------------------
+
+  template <>
+  struct ComparisonFunctor<float>
+  {
+    bool operator()( const float& value0, const float& value1 ) {
+      return ( std::abs(value0 - value1) <= 0.000001f * std::abs(value0) );
+    }
+  };
+
+  template <>
+  struct ComparisonFunctor<double>
+  {
+    bool operator()( const double& value0, const double& value1 ) {
+      return ( std::abs(value0 - value1) <= 0.000001 * std::abs(value0) );
+    }
+  };
 
   //----------------------------------------------------------------------
   // check_eq
@@ -22,11 +55,13 @@ namespace details {
   template < typename Expr1, typename Expr2 >
   void check_eq( const std::string& file_name, int line_num,
                  const Expr1& expression0, const Expr2& expression1,
-                 const std::string& expression0_str,
-                 const std::string& expression1_str )
+                 const char* expression0_str,
+                 const char* expression1_str )
   {
     utst::TestLog& log = utst::TestLog::instance();
-    bool result = (expression0 == expression1);
+
+    ComparisonFunctor<Expr1> comp_func;
+    bool result = comp_func( expression0, expression1 );
     
     std::ostringstream descr;
     descr << expression0_str << " == " << expression1_str;
@@ -38,39 +73,19 @@ namespace details {
   }
 
   //----------------------------------------------------------------------
-  // check_fp_eq
-  //----------------------------------------------------------------------
-
-  template < typename T >
-  void check_fp_eq( const std::string& file_name, int line_num,
-                    const T& num0, const T& num1,
-                    const std::string& expression0_str,
-                    const std::string& expression1_str )
-  {
-    utst::TestLog& log = utst::TestLog::instance();
-    bool result = ( std::abs(num0 - num1) <= 0.0001 * std::abs(num0) );
-    
-    std::ostringstream descr;
-    descr << expression0_str << " == " << expression1_str;
-    
-    std::ostringstream msg;
-    msg << num0 << (result ? " == " : " != ") << num1;
-    
-    log.log_test( file_name, line_num, descr.str(), result, msg.str() );
-  }
-
-  //----------------------------------------------------------------------
   // check_neq
   //----------------------------------------------------------------------
 
   template < typename Expr1, typename Expr2 >
   void check_neq( const std::string& file_name, int line_num,
-                 const Expr1& expression0, const Expr2& expression1,
-                 const std::string& expression0_str, 
-                 const std::string& expression1_str )
+                  const Expr1& expression0, const Expr2& expression1,
+                  const char* expression0_str, 
+                  const char* expression1_str )
   {
     utst::TestLog& log = utst::TestLog::instance();
-    bool result = (expression0 != expression1);
+
+    ComparisonFunctor<Expr1> comp_func;
+    bool result = !comp_func( expression0, expression1 );
     
     std::ostringstream descr;
     descr << expression0_str << " != " << expression1_str;
@@ -82,36 +97,14 @@ namespace details {
   }
 
   //----------------------------------------------------------------------
-  // check_fp_neq
-  //----------------------------------------------------------------------
-
-  template < typename T >
-  void check_fp_neq( const std::string& file_name, int line_num,
-                     const T& num0, const T& num1, 
-                     const std::string& expression0_str,
-                     const std::string& expression1_str )
-  {
-    utst::TestLog& log = utst::TestLog::instance();
-    bool result = !( std::abs(num0 - num1) <= 0.0001 * std::abs(num0) );
-    
-    std::ostringstream descr;
-    descr << expression0_str << " == " << expression1_str;
-    
-    std::ostringstream msg;
-    msg << num0 << (result ? " == " : " != ") << num1;
-    
-    log.log_test( file_name, line_num, descr.str(), result, msg.str() );
-  }
-
-  //----------------------------------------------------------------------
   // check_cont_eq
   //----------------------------------------------------------------------
 
   template < typename Cont1, typename Cont2 >
   void check_cont_eq( const std::string& file_name, int line_num,
                       const Cont1& container1, const Cont2& container2,
-                      const std::string& container1_str, 
-                      const std::string& container2_str )
+                      const char* container1_str, 
+                      const char* container2_str )
   {
     utst::TestLog& log = utst::TestLog::instance();
 
@@ -134,12 +127,13 @@ namespace details {
    
     typename Cont1::const_iterator itr1 = container1.begin();
     typename Cont2::const_iterator itr2 = container2.begin();
-   
+
     bool equal = true;
     int  index = 0;
     while ((itr1 != container1.end()) && (itr2 != container2.end())) {
 
-      if ( *itr1 != *itr2 ) {
+      ComparisonFunctor<typename Cont1::value_type> comp_func;
+      if ( !( comp_func( *itr1, *itr2 ) ) ) {
         equal = false;
 
         std::ostringstream descr;
@@ -173,8 +167,7 @@ namespace details {
     ~EFatalFailure() throw() { };
   };
 
-}
-}
+}}
 
 //------------------------------------------------------------------------
 // UTST_CHECK
@@ -193,27 +186,11 @@ namespace details {
     expression0_, expression1_, #expression0_, #expression1_ );
 
 //------------------------------------------------------------------------
-// UTST_CHECK_FP_EQ
-//------------------------------------------------------------------------
-
-#define UTST_CHECK_FP_EQ_( expression0_, expression1_ )                 \
-  utst::details::check_fp_eq( __FILE__, __LINE__,                       \
-    expression0_, expression1_, #expression0_, #expression1_ );
-
-//------------------------------------------------------------------------
 // UTST_CHECK_NEQ
 //------------------------------------------------------------------------
 
 #define UTST_CHECK_NEQ_( expression0_, expression1_ )                   \
   utst::details::check_neq( __FILE__, __LINE__,                         \
-    expression0_, expression1_, #expression0_, #expression1_ );
-
-//------------------------------------------------------------------------
-// UTST_CHECK_FP_NEQ
-//------------------------------------------------------------------------
-
-#define UTST_CHECK_FP_NEQ_( expression0_, expression1_ )                \
-  utst::details::check_fp_neq( __FILE__, __LINE__,                      \
     expression0_, expression1_, #expression0_, #expression1_ );
 
 //------------------------------------------------------------------------
@@ -235,9 +212,9 @@ namespace details {
 // UTST_CHECK_CONT_EQ
 //------------------------------------------------------------------------
 
-#define UTST_CHECK_CONT_EQ_( container1_, container2_ )                 \
+#define UTST_CHECK_CONT_EQ_( container0_, container1_ )                 \
   utst::details::check_cont_eq( __FILE__, __LINE__,                     \
-    container1_, container2_, #container1_, #container2_ );
+    container0_, container1_, #container0_, #container1_ );
 
 //------------------------------------------------------------------------
 // UTST_CHECK_FAILED

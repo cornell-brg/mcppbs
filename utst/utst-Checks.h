@@ -27,19 +27,12 @@
 // aid in debugging. This is not possible in a UTST_TEST test. Of course
 // this means a and b must have insertion operators defined for them. If
 // they don't then you are better off just using a UTST_CHECK test.
+// Floats and doubles are checked with a precision of 0.000001. If you
+// need more precision you will have to do the check explicitly with
+// UTST_CHECK.
 
 #define UTST_CHECK_EQ( expression0_, expression1_ ) \
   UTST_CHECK_EQ_( expression0_, expression1_ )
-
-//------------------------------------------------------------------------
-// UTST_CHECK_FP_EQ
-//------------------------------------------------------------------------
-// Check whether or not the given floating-point expresssions are within
-// 0.0001 of each other. If you need more precision you will have to do
-// the check explicitly with UTST_CHECK.
-
-#define UTST_CHECK_FP_EQ( expression0_, expression1_ ) \
-  UTST_CHECK_FP_EQ_( expression0_, expression1_ )
 
 //------------------------------------------------------------------------
 // UTST_CHECK_NEQ
@@ -51,20 +44,12 @@
 // which can aid in debugging. This is not possible in a UTST_TEST test.
 // Of course this means a and b must have insertion operators defined
 // for them. If they don't then you are better off just using a
-// UTST_TEST test.
+// UTST_TEST test. Floats and doubles are checked with a precision of
+// 0.000001. If you need more precision you will have to do the check
+// explicitly with UTST_CHECK.
 
 #define UTST_CHECK_NEQ( expression0_, expression1_ ) \
   UTST_CHECK_NEQ_( expression0_, expression1_ )
-
-//------------------------------------------------------------------------
-// UTST_CHECK_FP_NEQ
-//------------------------------------------------------------------------
-// Check whether or not the given floating-point expresssions are within
-// 0.0001 of each other. If you need more precision you will have to do
-// the check explicitly with UTST_CHECK.
-
-#define UTST_CHECK_FP_NEQ( expression0_, expression1_ ) \
-  UTST_CHECK_FP_NEQ_( expression0_, expression1_ )
 
 //------------------------------------------------------------------------
 // UTST_CHECK_THROW 
@@ -83,9 +68,12 @@
 //------------------------------------------------------------------------
 // Check whether or not the given STL containers are equal. To be equal
 // they must have the same number of elements and the corresponding
-// elements must be equal. Each container should have begin(), end(),
-// and size() member functions and the elements must have insertion
-// operators defined.
+// elements must be equal. Each container should have at least begin(),
+// end(), and size() member functions, a value_type typedef, and the
+// elements must have insertion operators defined. Containers of floats
+// and doubles are checked with a precision of 0.000001. If you need
+// more precision you will have to do the check explicitly with
+// UTST_CHECK.
 
 #define UTST_CHECK_CONT_EQ( container1_, container2_ ) \
   UTST_CHECK_CONT_EQ_( container1_, container2_ )
