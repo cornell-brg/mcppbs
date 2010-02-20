@@ -36,7 +36,7 @@ namespace utst {
   // This is a helper class whose constructor is mainly just used as a
   // way to run some code at static initialization time.
 
-  AutoRegister::AutoRegister( TestSuite* suite, 
+  AutoRegister::AutoRegister( TestSuite* suite,
                               const ITestCase& test_case )
   {
     suite->add_test( test_case );

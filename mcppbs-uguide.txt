@@ -165,7 +165,7 @@ files:
  - 'utst-*.d'         : Auto-generated dependency file per '.cc'
  - 'utst-*.o'         : Object file for each '.cc'
  - 'libutst.a'        : Library for 'utst' subproject
- - 'utst.t.d'         : Dependency file for 'utst.t.cc' unit test 
+ - 'utst.t.d'         : Dependency file for 'utst.t.cc' unit test
  - 'utst.t.o'         : Object file for 'utst.t.cc' unit test
  - 'utst-utst'        : Executable for 'utst.t.cc' unit test
  - 'utst-utst.out'    : Output from running 'utst-utst'
@@ -214,7 +214,7 @@ filename prefix with a dash as a separator (eg. 'utst-TestLog.h'). To
 add a new subproject, we need to take the following steps:
 
  - Create a new subdirectory with the abbreviated subproject name
- - Add the subproject's source files 
+ - Add the subproject's source files
  - Add autoconf and makefile fragments
  - Include the subproject in the top-level 'configure.ac'
 
@@ -245,22 +245,22 @@ unit testing framework see the general documentation in
 
  namespace sgp {
    class Point {
-    
+
     public :
      Point();
      Point( int x, int y );
      int get_x() const;
      int get_y() const;
-    
+
     private :
      int m_x, m_y;
-    
+
    };
-  
+
    std::ostream& operator<<( std::ostream& os, const Point& pt );
    bool operator==( const Point& pt1, const Point& pt2 );
    Point operator+( const Point& pt1, const Point& pt2 );
-  
+
  }
  #endif
 
@@ -275,26 +275,26 @@ file.
 <<'END'
 
  #include "sgp-Point.h"
-  
+
  namespace sgp {
-  
+
    Point::Point() : m_x(0), m_y(0) { }
    Point::Point( int x, int y ) : m_x(x), m_y(y) { }
    int Point::get_x() const { return m_x; }
    int Point::get_y() const { return m_y; }
-  
+
    std::ostream& operator<<( std::ostream& os, const Point& p ) {
      return ( os << "(" << p.get_x() << "," << p.get_y() << ")" );
    }
-   
+
    bool operator==( const Point& p1, const Point& p2 ) {
      return ((p1.get_x() == p2.get_x()) && (p1.get_y() == p2.get_y()));
    }
-  
+
    Point operator+( const Point& p1, const Point& p2 ) {
      return Point( p1.get_x()+p2.get_x(), p1.get_y()+p2.get_y() );
    }
-  
+
  }
 
 END
@@ -310,14 +310,14 @@ the addition of two points is working.
 
  #include "utst.h"
  #include "sgp-Point.h"
-  
+
  UTST_AUTO_TEST_CASE( TestAddition )
  {
    sgp::Point pt1(1,2);
    sgp::Point pt2(2,3);
    UTST_CHECK_EQ( pt1 + pt2, sgp::Point(3,5) );
  }
-  
+
  int main( int argc, char* argv[] ) {
    utst::auto_command_line_driver( argc, argv );
  }
@@ -336,7 +336,7 @@ and outputs their sum.
  #include <cstdlib>
 
  int main( int argc, char* argv[] ) {
-   if ( argc != 5 ) 
+   if ( argc != 5 )
      return 1;
 
    sgp::Point pt1(atoi(argv[1]),atoi(argv[2]));
@@ -381,7 +381,7 @@ source files which make up the 'sgp' subproject.
  sgp_cppflags  = @sgp_cppflags@
  sgp_ldflags   = @sgp_ldflags@
  sgp_libs      = @sgp_libs@
-                
+
  sgp_hdrs      = sgp-Point.h
  sgp_srcs      = sgp-Point.cc
  sgp_test_srcs = sgp-Point.t.cc
@@ -392,7 +392,7 @@ END
 
 We use 'sgp_' as a prefix for all make variables in the makefile
 fragment. Here is a list of all the recognized make variables for a
-subproject named 'sproj'. 
+subproject named 'sproj'.
 
  - 'sproj_hdrs;              : Headers (.h)
  - 'sproj_inls'              : Inline header/source files (.inl)
@@ -503,23 +503,23 @@ We now create the header file 'ipl-RasterImage.h'.
  #define IPL_RASTER_IMAGE_H
  #include "sgp-Point.h"
  #include <iostream>
-  
+
  namespace ipl {
    class RasterImage {
-    
+
     public :
      RasterImage();
      void set_diagram( const sgp::Point& pt );
      sgp::Point get_diagram() const;
-    
+
     private :
      sgp::Point m_pt;
-    
+
    };
-  
+
    std::ostream& operator<<( std::ostream& os, const RasterImage& im );
    bool operator==( const RasterImage& im1, const RasterImage& im2 );
-  
+
  }
  #endif
 
@@ -538,21 +538,21 @@ without the path. Next we create the source file 'ipl-RasterImage.cc'.
 <<'END'
 
  #include "ipl-RasterImage.h"
-  
+
  namespace ipl {
-  
+
    RasterImage::RasterImage() { }
    void RasterImage::set_diagram( const sgp::Point& pt ) { m_pt = pt; }
    sgp::Point RasterImage::get_diagram() const { return m_pt; }
-  
+
    std::ostream& operator<<( std::ostream& os, const RasterImage& im ) {
      return ( os << "[ " << im.get_diagram() << "]" );
    }
-  
+
    bool operator==( const RasterImage& im1, const RasterImage& im2 ) {
      return ( im1.get_diagram() == im2.get_diagram() );
    }
-  
+
  }
 
 END
@@ -567,7 +567,7 @@ single point. We now add a simple unit test.
  #include "utst.h"
  #include "sgp-Point.h"
  #include "ipl-RasterImage.h"
-  
+
  UTST_AUTO_TEST_CASE( TestBasic )
  {
    ipl::RasterImage im1, im2;
@@ -575,7 +575,7 @@ single point. We now add a simple unit test.
    im2.set_diagram( sgp::Point(1,2) );
    UTST_CHECK_EQ( im1, im2 );
  }
-  
+
  int main( int argc, char* argv[] ) {
    utst::auto_command_line_driver( argc, argv );
  }
@@ -692,8 +692,8 @@ autoconf code which we can add to 'ipl.ac' to do this check.
  AC_CHECK_HEADERS([jpeglib.h],[have_jpeg="yes"],[have_jpeg="no"])
  AS_IF([test "$have_jpeg" = "yes"],[
    AC_SEARCH_LIBS([jpeg_std_error],[jpeg],[],[have_jpeg="no"])
- ])   
-   
+ ])
+
  AS_IF([test "$have_jpeg" = "no"],[
    AC_MSG_WARN([Could not find jpeg library])
    AC_MSG_WARN([Build will not include jpeg support])
@@ -799,18 +799,18 @@ use some other data structure if it is not available.
   [ac_cv_have_std_vector],
  [
    AC_LANG([C++])
-  
+
    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
    [[
-     #include <vector>  
+     #include <vector>
    ]],[[
      std::vector<int> vec;
    ]])],
     [ac_cv_have_std_vector="yes"],
     [ac_cv_have_std_vector="no"])
-  
+
  ])
-  
+
  AS_IF([test "$ac_cv_have_std_vector" = "yes"],[
    AC_DEFINE([IPL_HAVE_STD_VECTOR],,[Define if std::vector is available])
  ])
@@ -888,7 +888,7 @@ Before moving on we make all the subprojects required again.
      -e 's/\(MCPPBS_INCLUDE_INTERNAL(\[sgp\)\*/\1/' \
      -e 's/\(MCPPBS_INCLUDE_INTERNAL(\[ipl\)\*/\1/' configure.ac
  % autoconf && autoheader
- % cd build 
+ % cd build
  % ../configure
  % make check
 
@@ -991,7 +991,7 @@ makefile to create the staging area and to run stow appropriately.
  % cd $PROJROOT/build
  % rm -rf install
  % ../configure --enable-stow --prefix=$PWD/install
- % make 
+ % make
  % make install
 
 Compare the result to what we saw earlier. Notice that the
@@ -1131,7 +1131,7 @@ subproject. Developers are strongly encouraged to include general user
 documentation in the spirit of 'utst-uguide.txt' to help users of the
 subproject. Every subproject should also include two files which tells
 the build system about the subproject: an autoconf fragment tells the
-top-level autoconf script how to configure the subproject 
+top-level autoconf script how to configure the subproject
 (eg. 'utst/utst.ac') and a makefile fragment tells the top-level makefile
 how to build the subproject (eg. 'utst/utst.mk.in'). The build system is
 similar in spirit to the non-recursive makefile approach advocated by
@@ -1148,7 +1148,7 @@ the uppercase form of the abbreviated subproject name (eg. the
 
 If there are two parts to a subproject's name they should be separated
 with a dash (eg. 'foo-bar') for physical purposes (ie. the subdirectory
-name and the file name prefix) and separated with an underscore 
+name and the file name prefix) and separated with an underscore
 (eg. 'foo_bar') for logical purpose (ie. the name of the subproject's
 C++ namespace and the preprocessor macro prefix).
 
@@ -1322,7 +1322,7 @@ the build directory):
  > ../configure --with-sproj-b
 
 To enable all optional subprojects we can use the
-'--with-optional-subprojects' command line argument. 
+'--with-optional-subprojects' command line argument.
 
 The final 'MCPPBS_INSTALL_LIBS' autoconf macro tells the build system
 which (if any) subproject libraries you would like to install.
@@ -1385,7 +1385,7 @@ to add a path to the linker and the compiler command lines. Simply set
 the 'LDFLAGS' and the 'CPPFLAGS' environment variables when configuring
 the project. Here is an example which will allow the build system to
 find a library if it is installed in '/opt/local':
- 
+
  > ../configure LDFLAGS='-L/opt/local/lib' \
                 CPPFLAGS='-I/opt/local/include'
 
@@ -1498,7 +1498,7 @@ into '/usr/local/lib'. To install the project somewhere else, a
 developer needs to use the 'configure' script's '--prefix' command line
 argument as follows:
 
- > ../configure --prefix=$HOME/install 
+ > ../configure --prefix=$HOME/install
  > make
  > make install
 
@@ -1512,8 +1512,8 @@ Sometimes files are installed one place but accessed from a different
 directory through symbolic links. For example, the GNU Stow package
 management system stages installs and uses symbolic links to help keep
 installed packages organized. For these type of installs, we need to set
-make's 'prefix' variable when we actually do the install. Set 
-'configure --prefix' to where the files will be accessed, and set 
+make's 'prefix' variable when we actually do the install. Set
+'configure --prefix' to where the files will be accessed, and set
 'make install prefix=' to where the files should actually be copied.
 
  > ../configure --prefix="access-dir"
@@ -1522,7 +1522,7 @@ make's 'prefix' variable when we actually do the install. Set
 
 The build system includes support for automatically using stow-based
 installation. To enable this feature use the '--enable-stow' command
-line option to the configure script. 
+line option to the configure script.
 
  > ../configure --enable-stow --prefix="access-dir"
  > make

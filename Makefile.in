@@ -334,7 +334,9 @@ install-exes : install-exes-$(1)
 all-$(1) : $$($(2)_libname) $$($(2)_prog_exes) $$($(2)_install_prog_exes)
 
 check-$(1) : $$($(2)_test_outs)
-	echo; grep -h -e'Unit Tests' -e'FAILED' -e'Segementation' $$^; echo
+	echo; \
+  grep -h -e'Unit Tests' -e'FAILED' -e'Segementation' -e'ERROR' $$^;
+  echo
 
 install-$(1) : install-libs-$(1) install-exes-$(1)
 
@@ -373,7 +375,9 @@ deps : $(deps)
 #-------------------------------------------------------------------------
 
 check : $(outs)
-	echo; grep -h -e'Unit Tests' -e'FAILED' -e'Segementation' $^; echo
+	echo; \
+  grep -h -e'Unit Tests' -e'FAILED' -e'Segementation' -e'ERROR' $^; \
+  echo
 
 .PHONY : check
 

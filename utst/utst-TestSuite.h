@@ -48,7 +48,7 @@ namespace utst {
     //--------------------------------------------------------------------
 
     // Adds a new test case to the suite
-    void add_test( const ITestCase& test_case );    
+    void add_test( const ITestCase& test_case );
 
     // Get the names of all the test cases in this suite
     std::vector<std::string> get_test_names() const;
@@ -70,9 +70,10 @@ namespace utst {
     std::string                      m_name;
     std::map<std::string,ITestCase*> m_name_map;
     std::vector<ITestCase*>          m_tests;
-    
+
   };
 
 }
 
 #endif /* UTST_TEST_SUITE_H */
+

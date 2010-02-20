@@ -16,8 +16,8 @@
 
 AC_DEFUN([MCPPBS_INIT],
 [
-  # Add command line argument to enable all optional subprojects 
-  
+  # Add command line argument to enable all optional subprojects
+
   AC_ARG_WITH(optional-subprojects,
     AS_HELP_STRING([--with-optional-subprojects],
       [Include all optional subprojects]))
@@ -52,7 +52,7 @@ AC_DEFUN([MCPPBS_ALWAYS_USE_CXX],
 # the stow program is available and if so it will set the $stow shell
 # variable to the binary name and the $enable_stow shell variable to
 # "yes". These variables can be used in a makefile to conditionally use
-# stow for installation. 
+# stow for installation.
 #
 # This macro uses two environment variables to help setup default stow
 # locations. The $STOW_PREFIX is used for stowing native built packages.
@@ -86,7 +86,7 @@ AC_DEFUN([MCPPBS_PROG_INSTALL],
       [enable_stow="yes"],[enable_stow="no"])
 
   AC_SUBST([enable_stow])
-   
+
   # Environment variables
 
   AC_ARG_VAR([STOW_ROOT],   [Root for non-native stow-based installs])
@@ -97,10 +97,10 @@ AC_DEFUN([MCPPBS_PROG_INSTALL],
   AC_PROG_INSTALL
 
   # Deterimine if native build and set prefix appropriately
-  
+
   AS_IF([ test "${enable_stow}" = "yes" ],
   [
-    AC_CHECK_PROGS([stow],[stow],[no])  
+    AC_CHECK_PROGS([stow],[stow],[no])
     AS_IF([ test "${stow}" = "no" ],
     [
       AC_MSG_ERROR([Cannot use --enable-stow since stow is not available])
@@ -135,7 +135,7 @@ AC_DEFUN([MCPPBS_PROG_INSTALL],
       ])
 
     ])
-      
+
   ])
 
 ])
@@ -148,7 +148,7 @@ AC_DEFUN([MCPPBS_PROG_INSTALL],
 # empty for native builds or to the name of the isa simulator for
 # non-native builds. Thus a makefile can run compiled programs
 # regardless if we are doing a native or non-native build like this:
-# 
+#
 #  $(RUN) $(RUNFLAGS) ./test-program
 #
 
@@ -198,7 +198,7 @@ AC_DEFUN([MCPPBS_PROG_RUN],
 #  - @foo_intdeps@  : List of internal subproject dependencies
 #  - @foo_cppflags@ : List of include paths (-I)
 #  - @foo_ldflags@  : List of library paths (-L)
-#  - @foo_libs@     : List of libraries (-l) 
+#  - @foo_libs@     : List of libraries (-l)
 #
 # Note that we use a m4_define instead of AC_DEFUN for now because
 # otherwise autoconf will call macros specified with AC_REQUIRE at the
@@ -243,14 +243,14 @@ m4_define([MCPPBS_INCLUDE_INTERNAL],
   # subproject later by just executing this function.
 
   MCPPBS_SPROJU[]_cfg ()
-  { 
+  {
     AC_CONFIG_HEADERS(MCPPBS_SPROJ[]-config.h:config.h.in)
     AC_CONFIG_FILES(MCPPBS_SPROJ[].mk:MCPPBS_SPROJ[]/MCPPBS_SPROJ[].mk.in)
     AC_DEFINE(m4_toupper(HAVE_[]MCPPBS_SPROJU),,
       [Define if we should include subproject] MCPPBS_SPROJ )
     AS_VAR_APPEND([mcppbs_include_internal_en],"MCPPBS_SPROJ ")
     with_[]MCPPBS_SPROJU="yes"
-    m4_include(MCPPBS_SPROJ[]/MCPPBS_SPROJ[].ac) 
+    m4_include(MCPPBS_SPROJ[]/MCPPBS_SPROJ[].ac)
   };
 
   # See if we should actually configure this subproject and if so then
@@ -318,7 +318,7 @@ AC_DEFUN([MCPPBS_INCLUDE_EXTERNAL],
   # optional subproject later by just executing this function.
 
   MCPPBS_SPROJU[]_cfg ()
-  { 
+  {
     # First see if the PKG_CONFIG shell variable is already set. If not
     # then we check and see if pkg-config is in our path. We use
     # AC_CHECK_TOOL so that if this is a non-native build we
@@ -354,7 +354,9 @@ AC_DEFUN([MCPPBS_INCLUDE_EXTERNAL],
 
     MCPPBS_SPROJU[]_cppflags=`${PKG_CONFIG} --cflags MCPPBS_SPROJ`
     MCPPBS_SPROJU[]_ldflags=`${PKG_CONFIG} --libs-only-L MCPPBS_SPROJ`
-    MCPPBS_SPROJU[]_libs=`${PKG_CONFIG} --libs-only-other --libs-only-l MCPPBS_SPROJ`
+    MCPPBS_SPROJU[]_libs=`${PKG_CONFIG} --libs-only-l MCPPBS_SPROJ`
+    AS_VAR_APPEND(MCPPBS_SPROJU[]_libs,
+     `${PKG_CONFIG} --libs-only-other MCPPBS_SPROJ`)
 
     AC_SUBST(MCPPBS_SPROJU[]_cppflags)
     AC_SUBST(MCPPBS_SPROJU[]_ldflags)
@@ -437,7 +439,7 @@ m4_define([MCPPBS_SUBPROJECT],
 
   m4_if(m4_normalize($1),MCPPBS_SPROJ,[],
   [
-    m4_fatal(Subproject name in configure.ac does not match name 
+    m4_fatal(Subproject name in configure.ac does not match name
              in MCPPBS_SPROJ.ac ('MCPPBS_SPROJ' != 'm4_normalize($1)'))
   ])
 
@@ -465,7 +467,7 @@ m4_define([MCPPBS_SUBPROJECT],
   m4_foreach([MCPPBS_DEP],[$2],
   [
     # Determine if this dependency is required or optional
-   
+
     m4_define([MCPPBS_DEP_OPTIONAL],
       m4_bmatch(MCPPBS_DEP,[\*],[true],[false]))
 
@@ -525,7 +527,7 @@ m4_define([MCPPBS_SUBPROJECT],
   _MCPPBS_UNIQ([MCPPBS_SPROJU[]_cppflags])
   _MCPPBS_UNIQ([MCPPBS_SPROJU[]_ldflags])
   _MCPPBS_UNIQ([MCPPBS_SPROJU[]_libs])
-  
+
   # Keep a copy of the compiler and linker flags as they are now,
   # because if we want to install this project we don't really need to
   # include these flags in the pkg-config file. We do of course need to
@@ -589,9 +591,9 @@ m4_defun([_MCPPBS_CREATE_EXTRA_FLAGS],
   elif ( test -n "${$1_$2}" && test -n "${$1_base_$2}" ); then
     $1_extra_$2=`echo "${$1_$2}" | sed "s|${$1_base_$2}||"`
 
-  # If at least one input was empty then the substitution is not needed
+  # If at least one input was empty then extra is just current value
   else
-    $1_extra_$2="${$1_base_$2}"
+    $1_extra_$2="${$1_$2}"
 
   fi
 
@@ -606,15 +608,15 @@ m4_defun([_MCPPBS_CREATE_EXTRA_FLAGS],
 # headers of course) for the given subproject. For a subproject to be
 # able to be installed it must have a pkg-config subproject.pc.in file
 # which can use the following substitution variables:
-#  
+#
 #  - @foo_pkcdeps@        : List of all subproject dependencies
 #  - @foo_extra_cppflags@ : List of include paths (-I)
 #  - @foo_extra_ldflags@  : List of library paths (-L)
-#  - @foo_extra_libs@     : List of libraries (-l) 
+#  - @foo_extra_libs@     : List of libraries (-l)
 #
 # The "extra" compiler and linker flags are the subset of the compiler
 # and linker flags used in the makefile which are not provided by other
-# subprojects. 
+# subprojects.
 #
 # It is an error for an "install" subproject to depend on subprojects
 # which are internal and not marked for installation.
@@ -672,8 +674,8 @@ AC_DEFUN([MCPPBS_INSTALL_LIBS],
       _MCPPBS_CREATE_EXTRA_FLAGS([mcppbs_sproju],[cppflags])
       _MCPPBS_CREATE_EXTRA_FLAGS([mcppbs_sproju],[ldflags])
       _MCPPBS_CREATE_EXTRA_FLAGS([mcppbs_sproju],[libs])
- 
-      # Create subproject.pc from subproject.pc.in 
+
+      # Create subproject.pc from subproject.pc.in
 
       AC_CONFIG_FILES(${mcppbs_sproj}.pc:${mcppbs_sproj}/${mcppbs_sproj}.pc.in)
     ])

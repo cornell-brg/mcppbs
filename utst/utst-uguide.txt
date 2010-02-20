@@ -18,7 +18,7 @@ A test includes a set of checks which are grouped into test cases which
 are then further grouped into test suites. Running the tests is
 controlled by a test driver. Much of the details of the framework are
 abstracted away behind preprocessor macros and helper functions, making
-it quite simple to write basic unit tests. 
+it quite simple to write basic unit tests.
 
 This user guide is divided into two parts: the first part is a tutorial,
 and the second part contains general user reference. We will assume that
@@ -90,11 +90,21 @@ for this tutorial called 'utst-tut'.
  % cd $PROJROOT
  % mkdir utst-tut
  % cd utst-tut
- % touch utst-tut.ac
- % touch utst-tut.mk.in
+ % echo "MCPPBS_SUBPROJECT([utst-tut])" > utst-tut.ac
+ % cat > utst-tu.mk.in \
+<<'END'
+
+ utst_tut_intdeps   = @utst_tut_intdeps@
+ utst_tut_cppflags  = @utst_tut_cppflags@
+ utst_tut_ldflags   = @utst_tut_ldflags@
+ utst_tut_libs      = @utst_tut_libs@
+
+END
 
  % cd $PROJROOT
- % sed -i.bak 's/\(MCPPBS_SUBPROJECTS(\[utst\)/\1,utst-tut/' configure.ac
+ % sed -i.bak '/MCPPBS_INCLUDE_INTERNAL(\[utst\])/ a \
+     MCPPBS_INCLUDE_INTERNAL([utst-tut])
+   ' configure.ac
  % autoconf && autoheader
 
 Normally, we each physical "component" (i.e. a C++ header and source
@@ -138,15 +148,15 @@ perform some basic tests of the STL 'vector' class.
  UTST_AUTO_TEST_CASE( TestBasic )
  {
    std::vector<int> vec;
-   
+
    UTST_CHECK( vec.empty() );
    UTST_CHECK_EQ( vec.size(), 0u );
-    
+
    vec.resize(3);
    vec.at(0) = 0;
    vec.at(1) = 1;
    vec.at(2) = 2;
-    
+
    UTST_CHECK( !vec.empty() );
    UTST_CHECK_EQ( vec.size(), 3u );
    UTST_CHECK_EQ( vec.at(0), 0 );
@@ -208,7 +218,7 @@ The output from running the unit test will now be more verbose:
 
  Unit Tests : utst-tut-Test1
  Running test suite : default
- 
+
   + Running test case : TestBasic
      [ passed ] Line 9 : vec.empty()
      [ passed ] Line 10 : vec.size() == 0u [ 0 == 0 ]
@@ -258,22 +268,22 @@ unit test source file.
    vec.at(0) = 0;
    vec.at(1) = 1;
    vec.at(2) = 2;
-  
+
    UTST_CHECK_THROW( std::out_of_range, vec.at(3) );
  }
-  
+
  UTST_AUTO_TEST_CASE( TestPushBack )
  {
    std::list<int> lst;
    lst.push_back(0);
    lst.push_back(1);
    lst.push_back(2);
-  
+
    std::vector<int> vec;
    vec.push_back(0);
    vec.push_back(1);
    vec.push_back(2);
-  
+
    UTST_CHECK_CONT_EQ( lst, vec );
  }
 
@@ -291,7 +301,7 @@ element which is beyond the size of the vector. The 'UTST_CHECK_CONT_EQ'
 macro verifies that two containers are the same. It requires that the
 containers have 'begin()', 'end()', and 'size()' methods. Let's add the
 new unit test to the make fragment and compile and built the new unit
-test. 
+test.
 
  % cd $PROJROOT/utst-tut
  % echo "utst_tut_test_srcs += utst-tut-Test2.t.cc" >> utst-tut.mk.in
@@ -330,8 +340,8 @@ the same values.
  #include <vector>
  #include <list>
 
- class TestPushBackParam 
-   : public utst::ITestCase_BasicImpl<TestPushBackParam> 
+ class TestPushBackParam
+   : public utst::ITestCase_BasicImpl<TestPushBackParam>
  {
 
   public:
@@ -341,27 +351,27 @@ the same values.
      ost << "TestPushBack_size" << size;
      set_name( ost.str() );
    }
-  
+
    void the_test()
    {
      std::list<int>   lst;
      std::vector<int> vec;
-    
+
      for ( int i = 0; i < m_size; i++ ) {
        int random_int = rand() % 100;
        lst.push_back( random_int );
        vec.push_back( random_int );
      }
-  
+
      UTST_CHECK_CONT_EQ( lst, vec );
    }
-  
+
   private:
    int m_size;
-  
+
  };
 
- using namespace utst;  
+ using namespace utst;
 
  AutoRegister ar_test1   ( &g_default_suite(), TestPushBackParam(1)   );
  AutoRegister ar_test2   ( &g_default_suite(), TestPushBackParam(2)   );
@@ -427,10 +437,10 @@ the 'push_back' method.
  UTST_AUTO_EXTRA_TEST_CASE( perf, PerfAssign )
  {
    using namespace std;
-  
+
    int num_trials      = 1e6;
    int num_elm_per_vec = 1e3;
-  
+
    clock_t start = clock();
    for ( int i = 0; i < num_trials; i++ ) {
      std::vector<int> vec(num_elm_per_vec);
@@ -438,21 +448,21 @@ the 'push_back' method.
        vec[j] = j;
    }
    clock_t end = clock();
-  
+
    utst::TestLog& log = utst::TestLog::instance();
    ostream& os = log.get_log_ostream( utst::TestLog::LogLevel::minimal );
    os << "     - assign_num_trials = " << num_trials << endl;
    os << "     - assign_num_elm    = " << num_elm_per_vec << endl;
    os << "     - assign_total_time = " << (end - start) << endl;
  }
-  
+
  UTST_AUTO_EXTRA_TEST_CASE( perf, PerfPushBack )
  {
    using namespace std;
-  
+
    int num_trials      = 5e5;
    int num_elm_per_vec = 1e3;
-  
+
    clock_t start = clock();
    for ( int i = 0; i < num_trials; i++ ) {
      std::vector<int> vec;
@@ -460,14 +470,14 @@ the 'push_back' method.
        vec.push_back(j);;
    }
    clock_t end = clock();
-  
+
    utst::TestLog& log = utst::TestLog::instance();
    ostream& os = log.get_log_ostream( utst::TestLog::LogLevel::minimal );
    os << "     - push_num_trials   = " << num_trials << endl;
    os << "     - push_num_elm      = " << num_elm_per_vec << endl;
    os << "     - push_total_time   = " << (end - start) << endl;
  }
-  
+
  int main( int argc, char* argv[] )
  {
    utst::auto_command_line_driver( argc, argv );
@@ -609,10 +619,10 @@ unit test for the standard STL 'vector' class.
  {
    utst::TestLog& log = utst::TestLog::instance();
    log.set_log_level( utst::TestLog::LogLevel::verbose );
-   
+
    std::vector<int> vec(2);
    vec.at(0) = 0; vec.at(1) = 1;
-   
+
    UTST_CHECK_EQ( vec.size(), 2u );
    UTST_CHECK_EQ( vec.at(0),  0  );
    UTST_CHECK_EQ( vec.at(1),  1  );
@@ -680,7 +690,7 @@ example shows how to use this macro to write the same basic test case.
  {
    std::vector<int> vec(2);
    vec.at(0) = 0; vec.at(1) = 1;
-   
+
    UTST_CHECK_EQ( vec.size(), 2u );
    UTST_CHECK_EQ( vec.at(0),  0  );
    UTST_CHECK_EQ( vec.at(1),  1  );
@@ -709,21 +719,21 @@ and then check at the end that both containers have the same values.
      ost << "TestBasic_size" << size;
      set_name( ost.str() );
    }
-   
+
    void the_test()
    {
      std::list<int>   lst;
      std::vector<int> vec;
-    
+
      for ( int i = 0; i < m_size; i++ ) {
        int random_int = rand() % 100;
        lst.push_back( random_int );
        vec.push_back( random_int );
      }
-   
+
      UTST_CHECK_CONT_EQ( lst, vec );
    }
-   
+
   private:
    int m_size;
 
@@ -745,23 +755,23 @@ parameterized test case to test the push back with one and 100 elements.
  {
    utst::TestLog& log = utst::TestLog::instance();
    log.set_log_level( utst::TestLog::LogLevel::verbose );
-  
+
    // Instantiate the test cases and add them to a container
    std::list<utst::ITestCase*> tests;
    tests.push_back( new TestBasic()          );
    tests.push_back( new TestRangeException() );
    tests.push_back( new TestPushBack(1)      );
    tests.push_back( new TestPushBack(100)    );
-  
-   // Iterate over test cases and run them  
+
+   // Iterate over test cases and run them
    typedef std::list<utst::ITestCase*>::iterator ITR;
    for ( ITR itr = tests.begin(); itr != tests.end(); ++itr )
      (*itr)->run();
-  
-   // Delete the test cases since they were dynamically allocated  
+
+   // Delete the test cases since they were dynamically allocated
    for ( ITR itr = tests.begin(); itr != tests.end(); ++itr )
      delete *itr;
-  
+
  }
 
 --------------------------------------------------------------------------
@@ -782,16 +792,16 @@ then run all the tests.
  {
    utst::TestLog& log = utst::TestLog::instance();
    log.set_log_level( utst::TestLog::LogLevel::verbose );
-  
-   // Instantiate the test cases and add them to a test suite  
+
+   // Instantiate the test cases and add them to a test suite
    utst::TestSuite suite("std::vector");
    suite.add_test( TestBasic()          );
    suite.add_test( TestRangeException() );
    suite.add_test( TestPushBack(1)      );
    suite.add_test( TestPushBack(100)    );
-  
-   // Run all the test cases  
-   suite.run_all();  
+
+   // Run all the test cases
+   suite.run_all();
  }
 
 --------------------------------------------------------------------------
@@ -821,12 +831,12 @@ driver.
    default_suite.add_test( TestRangeException() );
    default_suite.add_test( TestPushBack(1)      );
    default_suite.add_test( TestPushBack(100)    );
-  
+
    // Instantiate performance test cases and add them to perf suite
    utst::TestSuite perf_suite("perf");
    perf_suite.add_test( PerfAssign()   );
    perf_suite.add_test( PerfPushBack() );
-  
+
    // Use command line to drive the tests
    utst::CommandLineTestDriver driver;
    driver.add_suite( &default_suite );
@@ -916,7 +926,7 @@ automatically added to the global default test suite.
  {
    std::vector<int> vec(2);
    vec.at(0) = 0; vec.at(1) = 1;
-   
+
    UTST_CHECK_EQ( vec.size(), 2u );
    UTST_CHECK_EQ( vec.at(0),  0  );
    UTST_CHECK_EQ( vec.at(1),  1  );
@@ -930,7 +940,7 @@ specifying the desired global test suite.
  {
    std::vector<int> vec(2);
    vec.at(0) = 0; vec.at(1) = 1;
-   
+
    UTST_CHECK_EQ( vec.size(), 2u );
    UTST_CHECK_EQ( vec.at(0),  0  );
    UTST_CHECK_EQ( vec.at(1),  1  );
@@ -957,3 +967,4 @@ Although the auto registration features makes unit testing simple, we
 can always explicitly use the framework as described in the earlier
 sections when we need to do something non-standard (eg. parameterized
 test cases, additional test suites, etc).
+

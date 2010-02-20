@@ -10,7 +10,7 @@
 // a developer first defines the test cases and adds them to a test
 // suite. Then a pointer to the suite is added to the driver, and the
 // driver is passed the command line arguments for processing.
-// 
+//
 // The test driver accepts the following command line usage:
 //
 //  % utst-exe [options] [suite ...] [case ...]
@@ -30,7 +30,7 @@
 //  - minimal  : Output failing checks only
 //  - moderate : Output failing checks and other log output
 //  - verbose  : Output passing/failing checks and other log output
-// 
+//
 
 #ifndef UTST_COMMAND_LINE_TEST_DRIVER_H
 #define UTST_COMMAND_LINE_TEST_DRIVER_H
@@ -75,9 +75,10 @@ namespace utst {
    private:
 
     std::vector<TestSuite*> m_suites;
-    
+
   };
 
 }
 
 #endif /* UTST_COMMAND_LINE_TEST_DRIVER_H */
+

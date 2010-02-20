@@ -26,15 +26,15 @@ namespace {
     typedef traits_type::off_type       off_type;
     typedef traits_type::pos_type       pos_type;
 
-    NullStreambuf() 
+    NullStreambuf()
     { }
 
-    ~NullStreambuf() 
+    ~NullStreambuf()
     { }
 
-    virtual std::streamsize xsputn( const char* c, std::streamsize n ) 
-    { 
-      return n; 
+    virtual std::streamsize xsputn( const char* c, std::streamsize n )
+    {
+      return n;
     }
 
     virtual int_type overflow( int_type c = traits_type::eof() )
@@ -48,7 +48,7 @@ namespace {
 
    public:
     NullOstream() : std::ostream( &m_buf ) { }
-    
+
    private:
     NullStreambuf m_buf;
 
@@ -75,15 +75,15 @@ namespace utst {
   // Constructors/Destructors
   //----------------------------------------------------------------------
 
-  TestLog::TestLog() 
-  { 
+  TestLog::TestLog()
+  {
     m_log_level        = TestLog::LogLevel::minimal;
     m_log_ostream_ptr  = &std::cout;
     m_null_ostream_ptr = new NullOstream;
   }
 
   TestLog::~TestLog()
-  { 
+  {
     delete m_null_ostream_ptr;
   }
 
@@ -120,7 +120,7 @@ namespace utst {
     m_log_ostream_ptr = log_ostream_ptr;
   }
 
-  std::ostream& 
+  std::ostream&
   TestLog::get_log_ostream( const TestLog::LogLevelEnum& log_level )
   {
     if ( m_log_level >= log_level )
@@ -139,7 +139,7 @@ namespace utst {
     if ( m_log_level != TestLog::LogLevel::minimal )
       *m_log_ostream_ptr << "\n";
   }
-  
+
   void TestLog::log_test_suite_end()
   { }
 
@@ -162,7 +162,7 @@ namespace utst {
   // Log note
   //----------------------------------------------------------------------
 
-  void TestLog::log_note( const std::string& file_name, int line_num, 
+  void TestLog::log_note( const std::string& file_name, int line_num,
                           const std::string& note )
   {
     if ( m_log_level != TestLog::LogLevel::minimal )
@@ -174,7 +174,7 @@ namespace utst {
   // Log test
   //----------------------------------------------------------------------
 
-  void TestLog::log_test( const std::string& file_name, int line_num, 
+  void TestLog::log_test( const std::string& file_name, int line_num,
                           const std::string& description, bool result,
                           const std::string& msg )
   {
@@ -196,3 +196,4 @@ namespace utst {
   }
 
 }
+

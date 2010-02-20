@@ -1,5 +1,5 @@
 //========================================================================
-// utst::TestLog : Unit test output log 
+// utst::TestLog : Unit test output log
 //========================================================================
 // Please read the documenation in utst-uguide.txt for more details on
 // the overall unit test framework.
@@ -42,7 +42,7 @@
 //  utst::TestLog& log = utst::TestLog::instance();
 //  std::ostream& os = log.get_log_ostream( utst::TestLog::LogLevel::verbose );
 //  os << "This is only displayed when the TestLog log level is verbose";
-// 
+//
 
 #ifndef UTST_TEST_LOG_H
 #define UTST_TEST_LOG_H
@@ -61,7 +61,7 @@ namespace utst {
     //--------------------------------------------------------------------
 
     // This is the global test log. There is only one test log for
-    // all tests and test suites. 
+    // all tests and test suites.
     static TestLog& instance();
 
     //--------------------------------------------------------------------
@@ -123,14 +123,14 @@ namespace utst {
 
     // Log a note located on the given file/line. Only display the
     // note if the log level is moderate or verbose.
-    void log_note( const std::string& file_name, int line_num, 
+    void log_note( const std::string& file_name, int line_num,
                    const std::string& note );
 
     // Log a test located on the given file/line with a string
     // describing the test, the result indicating whether or not the
     // test passed or failed, and a message providing additional
     // information about the test.
-    void log_test( const std::string& file_name, int line_num, 
+    void log_test( const std::string& file_name, int line_num,
                    const std::string& description, bool result,
                    const std::string& msg = "" );
 
@@ -148,3 +148,4 @@ namespace utst {
 }
 
 #endif /* UTST_TEST_LOG_H */
+

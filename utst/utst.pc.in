@@ -5,7 +5,7 @@
 # on how the Modular C++ Build System works.
 
 #-------------------------------------------------------------------------
-# Generic variables 
+# Generic variables
 #-------------------------------------------------------------------------
 
 prefix=@prefix@

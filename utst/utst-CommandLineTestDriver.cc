@@ -63,7 +63,7 @@ namespace utst {
   //----------------------------------------------------------------------
   // Constructors/Destructors
   //----------------------------------------------------------------------
-  
+
   CommandLineTestDriver::CommandLineTestDriver()
   { }
 
@@ -82,7 +82,7 @@ namespace utst {
   //----------------------------------------------------------------------
   // Running test cases
   //----------------------------------------------------------------------
-  
+
   void CommandLineTestDriver::run( int argc, char* argv[] ) const
   {
     using namespace std;
@@ -94,7 +94,7 @@ namespace utst {
     string::size_type end_pos   = exe_name.rfind("-utst");
     string base_name = exe_name.substr( start_pos+1, string::npos );
     string utst_name = exe_name.substr( start_pos+1, end_pos-start_pos-1 );
-    
+
     // Initialize data structure to track which tests are selected
 
     bool                  any_selections = false;
@@ -107,8 +107,8 @@ namespace utst {
 
     for ( int arg_idx = 1; arg_idx < argc; arg_idx++ ) {
       string arg_str = string(argv[arg_idx]);
-      
-      // --log-level 
+
+      // --log-level
 
       if ( (arg_str == "--log-level") && (arg_idx+1 < argc) ) {
 
@@ -122,10 +122,10 @@ namespace utst {
           TestLog::instance().set_log_level( TestLog::LogLevel::verbose );
         }
         else {
-          std::cerr << "\n Command Line Error: Unrecognized log level \"" 
+          std::cerr << "\n Command Line Error: Unrecognized log level \""
                     << log_level_str << "\"" << endl;
           display_usage_and_exit(base_name);
-        }   
+        }
       }
 
       // List tests option
@@ -134,7 +134,7 @@ namespace utst {
         for ( int i = 0; i < static_cast<int>(m_suites.size()); i++ ) {
           vector<string> test_names = m_suites.at(i)->get_test_names();
           if ( !test_names.empty() ) {
-            cout << "\n Test suite : " 
+            cout << "\n Test suite : "
                  << m_suites.at(i)->get_name() << endl;
 
             int test_names_sz = static_cast<int>(test_names.size());
@@ -146,7 +146,7 @@ namespace utst {
         }
         cout << "\n";
         return;
-      }        
+      }
 
       // Help option
 
@@ -181,7 +181,7 @@ namespace utst {
         if ( !found ) {
           std::cerr << "\n Command Line Error: \"" << arg_str << "\" "
                     << "is not a test suite or test case" << endl;
-          display_usage_and_exit(base_name);          
+          display_usage_and_exit(base_name);
         }
 
       }

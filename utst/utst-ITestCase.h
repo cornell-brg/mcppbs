@@ -14,13 +14,13 @@
 
 namespace utst {
 
-  class ITestCase 
+  class ITestCase
   {
 
    public:
 
     //--------------------------------------------------------------------
-    // Constructors/Destructors 
+    // Constructors/Destructors
     //--------------------------------------------------------------------
 
     // Virtual default destructor

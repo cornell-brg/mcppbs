@@ -24,7 +24,7 @@ namespace utst {
   }
 
   TestSuite::~TestSuite()
-  { 
+  {
     for ( int i = 0; i < static_cast<int>(m_tests.size()); i++ )
       delete m_tests.at(i);
   }
@@ -64,7 +64,7 @@ namespace utst {
       vec.push_back( m_tests.at(i)->get_name() );
     return vec;
   }
-  
+
   //----------------------------------------------------------------------
   // has_test
   //----------------------------------------------------------------------
@@ -132,11 +132,10 @@ namespace utst {
     TestLog::instance().log_test_suite_begin(m_name);
 
     for ( int i = 0; i < static_cast<int>(m_tests.size()); i++ )
-      m_tests.at(i)->run();    
+      m_tests.at(i)->run();
 
     TestLog::instance().log_test_suite_end();
   }
-  
-}
 
+}
 

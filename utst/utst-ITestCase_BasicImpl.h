@@ -12,7 +12,7 @@
 // the_test member function. Developers should make sure they set the
 // name of the test case to something descriptive (the name of the
 // subclass is usually appropriate).
-// 
+//
 // The reason this class is templated by the type of the subclass, is so
 // that it can implement the clone member function. See the
 // implementation if you are interested. The reason that subclasses
@@ -29,15 +29,15 @@
 //  UTST_AUTO_TEST_CASE( TestBasic )
 //  {
 //    std::vector<int> vec;
-//    
+//
 //    UTST_CHECK( vec.empty() );
 //    UTST_CHECK_EQ( vec.size(), 0u );
-//     
+//
 //    vec.resize(3);
 //    vec.at(0) = 0;
 //    vec.at(1) = 1;
 //    vec.at(2) = 2;
-//     
+//
 //    UTST_CHECK( !vec.empty() );
 //    UTST_CHECK_EQ( vec.size(), 3u );
 //    UTST_CHECK_EQ( vec.at(0), 0 );
@@ -55,7 +55,7 @@
 namespace utst {
 
   template < typename T >
-  class ITestCase_BasicImpl : public ITestCase 
+  class ITestCase_BasicImpl : public ITestCase
   {
 
    public:
@@ -128,3 +128,4 @@ namespace utst {
 
 #include "utst-ITestCase_BasicImpl.inl"
 #endif /* UTST_ITEST_CASE_BASIC_IMPL_H */
+

@@ -52,7 +52,7 @@
   UTST_CHECK_NEQ_( expression0_, expression1_ )
 
 //------------------------------------------------------------------------
-// UTST_CHECK_THROW 
+// UTST_CHECK_THROW
 //------------------------------------------------------------------------
 // Check if the given expresssion throws the given exception. The test
 // case will try and catch the exception and if it can then execution
@@ -104,7 +104,7 @@ namespace utst {
 
 #define UTST_CHECK_FAILED( message_ ) \
   UTST_CHECK_FAILED_( message_ )
-                      
+
 //------------------------------------------------------------------------
 // UTST_LOG_MSG
 //------------------------------------------------------------------------
@@ -128,3 +128,4 @@ namespace utst {
 
 #include "utst-Checks.inl"
 #endif /* UTST_CHECKS_H */
+

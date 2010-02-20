@@ -98,21 +98,21 @@ UTST_TEST_CASE( TestLogMacros )
 //------------------------------------------------------------------------
 
 class TestParameterizedTestCase
-  : public utst::ITestCase_BasicImpl<TestParameterizedTestCase> 
+  : public utst::ITestCase_BasicImpl<TestParameterizedTestCase>
 {
 
  public:
 
   TestParameterizedTestCase( int op1, int op2, int result )
-    : m_op1(op1), m_op2(op2), m_result(result) 
-  { 
+    : m_op1(op1), m_op2(op2), m_result(result)
+  {
     std::ostringstream ost;
     ost << "TestParameterizedTestCase_" << m_op1 << "_"
         << m_op2 << "_" << m_result;
     set_name( ost.str() );
   }
 
-  void the_test() 
+  void the_test()
   {
     UTST_CHECK( m_op1 + m_op2 == m_result );
     UTST_CHECK_EQ( m_op1 + m_op2, m_result );
@@ -174,3 +174,4 @@ int main( int argc, char* argv[] )
 
   utst::auto_command_line_driver( argc, argv );
 }
+

@@ -62,13 +62,13 @@ namespace details {
 
     ComparisonFunctor<Expr1> comp_func;
     bool result = comp_func( expression0, expression1 );
-    
+
     std::ostringstream descr;
     descr << expression0_str << " == " << expression1_str;
-    
+
     std::ostringstream msg;
     msg << expression0 << (result ? " == " : " != ") << expression1;
-    
+
     log.log_test( file_name, line_num, descr.str(), result, msg.str() );
   }
 
@@ -79,20 +79,20 @@ namespace details {
   template < typename Expr1, typename Expr2 >
   void check_neq( const std::string& file_name, int line_num,
                   const Expr1& expression0, const Expr2& expression1,
-                  const char* expression0_str, 
+                  const char* expression0_str,
                   const char* expression1_str )
   {
     utst::TestLog& log = utst::TestLog::instance();
 
     ComparisonFunctor<Expr1> comp_func;
     bool result = !comp_func( expression0, expression1 );
-    
+
     std::ostringstream descr;
     descr << expression0_str << " != " << expression1_str;
-    
+
     std::ostringstream msg;
     msg << expression0 << (result ? " != " : " == ") << expression1;
-    
+
     log.log_test( file_name, line_num, descr.str(), result, msg.str() );
   }
 
@@ -103,7 +103,7 @@ namespace details {
   template < typename Cont1, typename Cont2 >
   void check_cont_eq( const std::string& file_name, int line_num,
                       const Cont1& container1, const Cont2& container2,
-                      const char* container1_str, 
+                      const char* container1_str,
                       const char* container2_str )
   {
     utst::TestLog& log = utst::TestLog::instance();
@@ -112,19 +112,19 @@ namespace details {
 
     if ( container1.size() != container2.size() ) {
 
-      std::ostringstream descr;                                           
-      descr << container1_str << " and " 
+      std::ostringstream descr;
+      descr << container1_str << " and "
             << container2_str << " same size?";
-      
-      std::ostringstream msg;                                             
-      msg << container1.size() << " != " << container2.size();        
-      
-      log.log_test( file_name, line_num, descr.str(), false, msg.str() );  
+
+      std::ostringstream msg;
+      msg << container1.size() << " != " << container2.size();
+
+      log.log_test( file_name, line_num, descr.str(), false, msg.str() );
       return;
     }
 
     // Check each element in each container
-   
+
     typename Cont1::const_iterator itr1 = container1.begin();
     typename Cont2::const_iterator itr2 = container2.begin();
 
@@ -139,24 +139,24 @@ namespace details {
         std::ostringstream descr;
         descr << container1_str << "[" << index << "]" << " == "
               << container2_str << "[" << index << "]";
-      
+
         std::ostringstream msg;
-        msg << *itr1 << " != " << *itr2;        
+        msg << *itr1 << " != " << *itr2;
 
         log.log_test( file_name, line_num, descr.str(), false, msg.str() );
       }
 
       itr1++; itr2++; index++;
     }
-   
+
     // Are they equal?
-   
+
     if ( equal ) {
       std::ostringstream descr;
       descr << container1_str << " == " << container2_str;
       log.log_test( file_name, line_num, descr.str(), true );
     }
-  
+
   }
 
   //----------------------------------------------------------------------
@@ -194,7 +194,7 @@ namespace details {
     expression0_, expression1_, #expression0_, #expression1_ );
 
 //------------------------------------------------------------------------
-// UTST_CHECK_THROW 
+// UTST_CHECK_THROW
 //------------------------------------------------------------------------
 
 #define UTST_CHECK_THROW_( exception_, expression_ )                    \
@@ -250,3 +250,4 @@ namespace details {
   ost << #variable_ << " = " << variable_;                              \
   utst::TestLog::instance().log_note( __FILE__, __LINE__, ost.str() );  \
 }
+

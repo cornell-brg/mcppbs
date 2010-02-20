@@ -89,3 +89,4 @@ namespace utst {
 
 #include "utst-AutoUtils.inl"
 #endif /* UTST_AUTO_UTILS_H */
+

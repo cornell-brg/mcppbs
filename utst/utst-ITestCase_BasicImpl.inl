@@ -29,7 +29,7 @@
 // It's also pretty unnecessary - destructors should never throw
 // exceptions anyways and I doubt the compiler is enabled to do any
 // radical optimization based on having throw() defined on the
-// std::exception destructor. 
+// std::exception destructor.
 //
 // So as a workaround, we anticipate all of our user defined exceptions
 // inheriting from stdx::IException which will not include the throw()
@@ -47,7 +47,7 @@
 // same preprocessor conditions) eventually in our stdx exception code.
 // Maybe eventually I will come up with a better way to do this.
 //
-// Maybe we can use some kind of handler registration approach. So 
+// Maybe we can use some kind of handler registration approach. So
 // users could register a handler for stdx exceptions. We might be
 // able to use this kind of idiom:
 //
@@ -82,7 +82,7 @@ namespace stdx {
     virtual ~IException() { }
     virtual const char* what() const = 0;
   };
-} 
+}
 #endif
 
 namespace utst {
@@ -169,3 +169,4 @@ namespace utst {
     void the_test();                                                    \
   };                                                                    \
   void name_::the_test()
+
